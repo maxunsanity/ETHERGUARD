@@ -319,6 +319,45 @@ body {
     cursor: pointer;
 }
 
+/* Roulette Layer */
+#roulette-layer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 100px;
+    background: rgba(15, 23, 42, 0.9);
+    border: 3px solid var(--accent-gold);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 1rem;
+    z-index: 100;
+    box-shadow: 0 0 30px var(--accent-gold);
+    animation: zoomIn 0.3s ease-out;
+}
+
+.roulette-wheel {
+    color: var(--accent-gold);
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-shadow: 0 0 10px gold;
+    animation: spinText 0.1s infinite;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Dummy Dialog Style */
+.message.dummy {
+    font-style: italic;
+    opacity: 0.7;
+    font-size: 0.9rem;
+    color: var(--accent-blue);
+}
+
 /* Floating Effects */
 .damage-text {
     position: absolute;
@@ -330,10 +369,36 @@ body {
 }
 
 /* Animations */
+@keyframes zoomIn {
+    from {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0;
+    }
+}
+
+@keyframes spinText {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
         transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
