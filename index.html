@@ -4,23 +4,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EtherGuard - 에테르가드</title>
+    <title>EtherGuard - Combat Chat System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <div id="app">
-        <header>
-            <h1>ETHERGUARD</h1>
-            <p>보안과 에테르의 조화</p>
-        </header>
-        <main>
-            <section id="hero">
-                <h2>새로운 프로젝트가 시작되었습니다</h2>
-                <p>에테르가드에 오신 것을 환영합니다.</p>
-            </section>
-        </main>
+    <div class="app-container">
+        <!-- Left Slider: Face Icons -->
+        <aside class="character-slider glass">
+            <div class="slider-logo">EG</div>
+            <div class="face-icons" id="face-icons">
+                <!-- Circular face icons injected here -->
+            </div>
+            <div class="sidebar-footer">
+                <button id="btn-info" class="icon-btn">ℹ️</button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <div class="main-workspace">
+            <!-- Background Layer -->
+            <div class="character-bg-layer" id="character-bg"></div>
+
+            <!-- Interface Overlay -->
+            <div class="interface-overlay">
+                <!-- Top Header: Stats & Gauges -->
+                <header class="battle-header glass">
+                    <div class="target-profile">
+                        <div class="target-name-container">
+                            <span id="target-name">Character Name</span>
+                            <span id="target-trait" class="trait-tag">Trait</span>
+                        </div>
+                        <div class="gauges">
+                            <div class="gauge-group">
+                                <label>MENTAL (HP)</label>
+                                <div class="gauge-bar hp">
+                                    <div id="hp-fill"></div>
+                                </div>
+                            </div>
+                            <div class="gauge-group">
+                                <label>AFFINITY</label>
+                                <div class="gauge-bar trust">
+                                    <div id="trust-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Middle: Chat Area -->
+                <div class="chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="empty-state">좌측 슬라이드바에서 인물을 선택하세요.</div>
+                    </div>
+                </div>
+
+                <!-- Bottom: Skills & Input -->
+                <footer class="battle-footer glass">
+                    <div class="footer-top">
+                        <div class="skill-slots" id="skill-slots">
+                            <!-- Skill icons with counts -->
+                            <div class="skill-item" title="발화점">
+                                <span class="skill-icon">🔥</span>
+                                <span class="skill-count" id="item-count">5</span>
+                            </div>
+                        </div>
+                        <div class="user-info">
+                            <span class="label">MANAGER MENTAL</span>
+                            <div class="mini-gauge">
+                                <div id="user-hp-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="text" id="chat-input" placeholder="메시지를 입력하여 설득을 시작하세요..." disabled>
+                        <button id="send-btn" disabled>SEND</button>
+                    </div>
+                </footer>
+            </div>
+        </div>
     </div>
+
+    <!-- Floating Effects Container -->
+    <div id="fx-container"></div>
+
     <script src="main.js"></script>
 </body>
 
