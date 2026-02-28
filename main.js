@@ -715,43 +715,58 @@ function updateCharacterImage(src) {
 }
 
 // Matrix Logic
-document.getElementById('matrix-btn').addEventListener('click', () => {
-    const popup = document.getElementById('matrix-popup');
-    const grid = document.getElementById('matrix-grid');
-    const weakInfo = document.getElementById('target-weakness-info');
+function initMatrixLogic() {
+    const matrixBtn = document.getElementById('matrix-btn');
+    if (!matrixBtn) return;
 
-    grid.innerHTML = '';
-    Object.entries(synergyMap).forEach(([prop, data]) => {
-        const item = document.createElement('div');
-        item.className = 'matrix-item';
-        item.innerHTML = `<strong>${prop}</strong><br>
-            <span style="color:#22c55e">▶ ${data.strong}</span><br>
-            <span style="color:#ef4444">◀ ${data.weak}</span>`;
-        grid.appendChild(item);
+    matrixBtn.addEventListener('click', () => {
+        const popup = document.getElementById('matrix-popup');
+        const grid = document.getElementById('matrix-grid');
+        const weakInfo = document.getElementById('target-weakness-info');
+
+        grid.innerHTML = '';
+        Object.entries(synergyMap).forEach(([prop, data]) => {
+            const item = document.createElement('div');
+            item.className = 'matrix-item';
+            item.innerHTML = `<strong>${prop}</strong><br>
+                <span style="color:#22c55e">▶ ${data.strong}</span><br>
+                <span style="color:#ef4444">◀ ${data.weak}</span>`;
+            grid.appendChild(item);
+        });
+
+        if (currentTarget) {
+            const weaknesses = [];
+            Object.entries(synergyMap).forEach(([prop, data]) => {
+                const targetProps = currentTarget.props || [];
+                if (targetProps.includes(data.strong)) {
+                    weaknesses.push(`<span style="color:gold;font-weight:bold">${prop}</span>`);
+                }
+            });
+            weakInfo.innerHTML = `<strong>TARGET ANALYSIS:</strong><br>
+                지금 상대인 ${currentTarget.name}님은 ${weaknesses.length > 0 ? weaknesses.join(', ') : '특별한'} 속성 키워드에 취약합니다.`;
+        }
+
+        popup.classList.remove('hidden');
     });
 
-    if (currentTarget) {
-        const weaknesses = [];
-        Object.entries(synergyMap).forEach(([prop, data]) => {
-            if (currentTarget.properties.includes(data.strong)) {
-                weaknesses.push(`<span style="color:gold;font-weight:bold">${prop}</span>`);
-            }
+    const closeBtn = document.querySelector('.close-btn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            document.getElementById('matrix-popup').classList.add('hidden');
         });
-        weakInfo.innerHTML = `<strong>TARGET ANALYSIS:</strong><br>
-            지금 상대인 ${currentTarget.name}님은 ${weaknesses.join(', ')} 속성 키워드에 매우 취약합니다.`;
     }
 
-    popup.classList.remove('hidden');
-});
-
-document.querySelector('.close-btn').addEventListener('click', () => {
-    document.getElementById('matrix-popup').classList.add('hidden');
-});
-
-window.onclick = (event) => {
-    const popup = document.getElementById('matrix-popup');
-    if (event.target == popup) popup.classList.add('hidden');
+    window.onclick = (event) => {
+        const popup = document.getElementById('matrix-popup');
+        if (event.target == popup) popup.classList.add('hidden');
+    }
 }
+
+// Initialize Matrix on setup
+document.addEventListener('DOMContentLoaded', () => {
+    // Other init calls...
+    initMatrixLogic();
+});
 
 function shakeScreen(intensity) {
     const workspace = document.querySelector('.main-workspace');
