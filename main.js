@@ -140,16 +140,59 @@ function updateRepresentativeMarker() {
 }
 
 function autoFill(tag) {
+    if (!currentTarget) return;
+
+    // Cost check
+    if (inventoryFirePoints < 1) {
+        addMessage("[시스템] 발화점이 부족하여 자동 문장을 생성할 수 없습니다.", "ai", true);
+        return;
+    }
+
+    // Deduct cost
+    inventoryFirePoints -= 1;
+    document.getElementById('item-count').textContent = inventoryFirePoints;
+
     const input = document.getElementById('chat-input');
-    const templates = {
-        '#위로': '너무 걱정 마세요. 제가 항상 곁에서 지지하고 응원할게요.',
-        '#팩트': '데이터와 사실만 놓고 봅시다. 이 명분이 가장 합리적인 선택입니다.',
-        '#명령': '더 이상 지체할 시간 없어요. 제 결정을 따르세요.',
-        '#칭찬': '역시 안목이 대단하시네요. 이런 감각은 아무나 가질 수 없죠.',
-        '#논리': '이 상황에서는 논리적인 증거가 가장 중요합니다.'
+
+    // Logic for "AI-style" sentence generation based on Tag + Target Archetype
+    const pool = {
+        '#위로': [
+            `${currentTarget.name}님, 당신의 고충을 충분히 이해해요. 제가 곁에 있을게요.`,
+            `지쳐 보이지만 정말 잘하고 계세요. 잠시 제 어깨를 빌려드릴까요?`,
+            `혼자서 감당하기엔 너무 무거운 짐이었군요. 제가 나누어 들겠습니다.`
+        ],
+        '#팩트': [
+            `객관적으로 볼 때, ${currentTarget.name}님이 제안에 응하는 것이 가장 효율적입니다.`,
+            `이 수치는 거짓말을 하지 않죠. 합리적인 결론은 이미 나와 있습니다.`,
+            `데이터가 증명하듯, 우리의 협력은 서로에게 최상의 결과를 가져올 것입니다.`
+        ],
+        '#명령': [
+            `논란의 여지는 없습니다. 지금 바로 제 결정을 따르도록 하세요.`,
+            `더 이상의 지체는 피해만 키울 뿐입니다. 즉시 행동으로 옮기세요.`,
+            `제 권한으로 명합니다. 이 협약에 지금 즉시 서명하십시오.`
+        ],
+        '#공감': [
+            `저도 같은 상황이라면 똑같은 기분이었을 거예요. 정말 마음이 아프네요.`,
+            `${currentTarget.name}님의 입장에서 생각해보니 그 서운함이 충분히 느껴져요.`,
+            `말하지 않아도 알 것 같아요. 그 침묵 속에 담긴 무게를 제가 느낍니다.`
+        ],
+        '#칭찬': [
+            `역시 ${currentTarget.trait}답군요! 이런 감각은 아무나 가질 수 없는 재능이에요.`,
+            `${currentTarget.name}님의 안목은 정말 독보적입니다. 진심으로 존경스러워요.`,
+            `어떻게 그런 생각을 하셨죠? 기대 이상의 성과에 정말 감탄했습니다!`
+        ],
+        '#논리': [
+            `앞선 상황을 분석해볼 때, 이 논리가 가장 타당한 근거가 됩니다.`,
+            `A와 B를 연결하면 결국 우리가 가야 할 길은 명확해지죠. 시각을 넓혀보세요.`,
+            `논리적 허점이 전혀 없는 완벽한 계획입니다. 당신도 부정할 수 없을 거예요.`
+        ]
     };
-    input.value = templates[tag] || tag;
+
+    const sentences = pool[tag] || [tag];
+    input.value = sentences[Math.floor(Math.random() * sentences.length)];
     input.focus();
+
+    showFloatingText("-1 FIREPOINT", "#38bdf8");
 }
 
 function selectCharacter(char, icon) {
