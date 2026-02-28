@@ -259,8 +259,7 @@ function selectCharacter(char, icon) {
 
     const bgLayer = document.getElementById('character-bg');
     bgLayer.style.backgroundImage = `url('${char.bg}')`;
-    bgLayer.className = 'character-bg-layer'; // Class Reset
-    if (char.id === 'yuna') bgLayer.classList.add('live-bg');
+    bgLayer.className = 'character-bg-layer live-bg'; // Apply to all
 
     document.getElementById('target-name').textContent = char.name;
     document.getElementById('target-trait').textContent = char.trait;
