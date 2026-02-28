@@ -39,6 +39,7 @@
                         <div class="target-name-container">
                             <span id="target-name">Character Name</span>
                             <span id="target-trait" class="trait-tag">Trait</span>
+                            <div id="fever-timer" class="hidden">01:00</div>
                         </div>
                         <div class="gauges">
                             <div class="gauge-group">
@@ -48,7 +49,7 @@
                                 </div>
                             </div>
                             <div class="gauge-group">
-                                <label>AFFINITY</label>
+                                <label>TRUST / AFFINITY</label>
                                 <div class="gauge-bar trust">
                                     <div id="trust-fill"></div>
                                 </div>
@@ -59,6 +60,12 @@
 
                 <!-- Middle: Chat Area -->
                 <div class="chat-container">
+                    <!-- Combo Overlay -->
+                    <div id="combo-container" class="hidden">
+                        <span id="combo-count">0</span>
+                        <span class="combo-label">COMBO!</span>
+                    </div>
+
                     <!-- Skill Roulette Animation Layer -->
                     <div id="roulette-layer" class="hidden">
                         <div class="roulette-wheel">
@@ -73,11 +80,18 @@
                 <!-- Bottom: Skills & Input -->
                 <footer class="battle-footer glass">
                     <div class="footer-top">
-                        <div class="skill-slots" id="skill-slots">
-                            <!-- Skill icons with counts -->
-                            <div class="skill-item" title="발화점">
-                                <span class="skill-icon">🔥</span>
-                                <span class="skill-count" id="item-count">5</span>
+                        <div class="skill-controls">
+                            <div class="skill-slots" id="skill-slots">
+                                <div class="skill-item" title="발화점">
+                                    <span class="skill-icon">🔥</span>
+                                    <span class="skill-count" id="item-count">1000</span>
+                                </div>
+                            </div>
+                            <div class="firepoint-selector">
+                                <button class="fp-btn" data-val="1">x1</button>
+                                <button class="fp-btn" data-val="10">x10</button>
+                                <button class="fp-btn" data-val="100">MAX</button>
+                                <span class="fp-label">소모량: <span id="current-fp-use">1</span></span>
                             </div>
                         </div>
                         <div class="user-info">
@@ -87,6 +101,11 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="keyword-tags" id="keyword-tags">
+                        <!-- Auto-complete tags will be here -->
+                    </div>
+
                     <div class="input-wrapper">
                         <input type="text" id="chat-input" placeholder="메시지를 입력하여 설득을 시작하세요..." disabled>
                         <button id="send-btn" disabled>SEND</button>
