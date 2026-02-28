@@ -388,6 +388,13 @@ function processCombatHit(res, skill) {
     if (isMentalBreak) {
         currentTarget.trust = Math.min(currentTarget.maxTrust, currentTarget.trust + res.dmg);
         showFloatingText(`+${res.dmg} TRUST`, "gold");
+
+        // Instant check for early completion
+        if (currentTarget.trust >= currentTarget.maxTrust) {
+            if (breakTimerFunc) clearInterval(breakTimerFunc);
+            endMentalBreak();
+            return; // Exit early as target is switched
+        }
     } else {
         const overDmg = Math.max(0, res.dmg - currentTarget.currentHp);
         currentTarget.currentHp = Math.max(0, currentTarget.currentHp - res.dmg);
@@ -489,14 +496,28 @@ function endMentalBreak() {
     document.getElementById('fever-timer').classList.add('hidden');
 
     if (currentTarget.trust >= currentTarget.maxTrust) {
-        currentTarget.isUnlocked = true;
-        addMessage(`[경축] ${currentTarget.name} 캐릭터를 전적으로 섭외했습니다!`, 'ai', true);
-        document.querySelectorAll('.face-icon').forEach((el, i) => {
-            if (characters[i] === currentTarget) {
-                el.classList.add('unlocked');
-                el.classList.add('recruited');
-            }
-        });
+        if (!currentTarget.isUnlocked) {
+            currentTarget.isUnlocked = true;
+            addMessage(`[경축] ${currentTarget.name} 캐릭터를 전적으로 섭외했습니다!`, 'ai', true);
+            document.querySelectorAll('.face-icon').forEach((el, i) => {
+                if (characters[i].id === currentTarget.id) {
+                    el.classList.add('unlocked');
+                    el.classList.add('recruited');
+                }
+            });
+
+            // Auto switch to next un-recruited character
+            setTimeout(() => {
+                const nextTarget = characters.find(c => !c.isUnlocked);
+                if (nextTarget) {
+                    addMessage(`[안내] 다음 타겟인 ${nextTarget.name}님에게로 이동합니다.`, 'ai', true);
+                    const nextIcon = document.querySelector(`.face-icon[data-id="${nextTarget.id}"]`);
+                    selectCharacter(nextTarget, nextIcon);
+                } else {
+                    addMessage(`[정보] 모든 캐릭터를 섭외 완료했습니다! 당신은 진정한 에테르가드 마스터입니다.`, 'ai', true);
+                }
+            }, 1500);
+        }
     }
     currentTarget.currentHp = currentTarget.stats.hp;
     updateUIGauges();
