@@ -91,6 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
     startTrustDecay();
 });
 
+const ALL_TAGS = ['#명령', '#논리', '#위로', '#공감', '#칭찬', '#팩트', '#질문', '#도발', '#회유', '#결단'];
+
 function initUI() {
     const slider = document.getElementById('face-icons');
     characters.forEach(char => {
@@ -123,8 +125,18 @@ function initUI() {
         if (e.key === 'Enter') handleSend();
     };
 
+    refreshTags();
+}
+
+function refreshTags() {
     const tagContainer = document.getElementById('keyword-tags');
-    ['#명령', '#논리', '#위로', '#공감', '#칭찬', '#팩트'].forEach(tag => {
+    tagContainer.innerHTML = '';
+
+    // Shuffle and pick 6
+    const shuffled = [...ALL_TAGS].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, 6);
+
+    selected.forEach(tag => {
         const btn = document.createElement('button');
         btn.className = 'tag-btn';
         btn.textContent = tag;
@@ -198,6 +210,26 @@ function autoFill(tag) {
             `앞선 상황을 분석해볼 때, 이 논리가 가장 타당한 근거가 됩니다.`,
             `A와 B를 연결하면 결국 우리가 가야 할 길은 명확해지죠. 시각을 넓혀보세요.`,
             `논리적 허점이 전혀 없는 완벽한 계획입니다. 당신도 부정할 수 없을 거예요.`
+        ],
+        '#질문': [
+            `${currentTarget.name}님은 이 상황에서 본인의 신념과 이익 중 무엇을 선택하실 건가요?`,
+            `우리가 함께할 때 발생할 시너지가 보이지 않나요? 한번 더 깊게 생각해보시죠.`,
+            `단도입입적으로 묻겠습니다. 당신이 진정으로 원하는 미래는 무엇입니까?`
+        ],
+        '#도발': [
+            `겨우 이 정도에 무너질 분이었나요? 당신의 명성이 아깝군요.`,
+            `제 논리에 반박하지 못하는 것을 보니, 이미 마음은 기운 것 같네요.`,
+            `입으로만 큰 뜻을 말하는 건 누구나 할 수 있죠. 행동으로 보여주시겠습니까?`
+        ],
+        '#회유': [
+            `너무 날을 세우지 마세요. 우리 둘 다 웃을 수 있는 최선의 길을 제시하는 것뿐입니다.`,
+            `잠시만 감정을 내려놓고 제 제안을 재검토해 주세요. 후회하지 않으실 겁니다.`,
+            `우리는 적이 아니라 친구가 될 수 있는 운명이라고 생각합니다. 제 손을 잡으세요.`
+        ],
+        '#결단': [
+            `시간이 얼마 없습니다. 지금 결정하지 않으면 이 기회는 영원히 사라질 거예요.`,
+            `이제 망설임을 끝내야 할 때입니다. 제 결론은 이미 확고합니다.`,
+            `결정은 당신의 몫이지만, 결과에 대한 책임도 당신의 몫이라는 것을 명심하세요.`
         ]
     };
 
@@ -298,7 +330,12 @@ async function executeCombatLoop(text) {
 
     // D. 타겟 반격 (C 타입)
     if (!isMentalBreak && currentTarget.currentHp > 0) {
-        setTimeout(() => processTargetCounter(text), 800);
+        setTimeout(() => {
+            processTargetCounter(text);
+            refreshTags(); // Refresh tags after turn
+        }, 800);
+    } else {
+        refreshTags(); // Also refresh after fever time or other ends
     }
 }
 
