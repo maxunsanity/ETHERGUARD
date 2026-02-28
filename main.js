@@ -1,6 +1,6 @@
 /** 
- * ETHERGUARD Core Combat Engine v2.0
- * Implementation of 5-Ego Stats, Mental Break, Trust Decay, and Multi-Type Combat
+ * ETHERGUARD Core Combat Engine v2.1
+ * Added Support System, Representative Marker, and Detailed Combat Visuals
  */
 
 const characters = [
@@ -8,7 +8,7 @@ const characters = [
         id: 'yuna', name: '유나 (유비)', trait: '성실·학생회장', avatar: '🎓', bg: 'yuna_bg.png',
         archetype: '공감하는 리더', props: ['HEART', 'BODY'],
         stats: { atk: 320, acc: 300, crt: 150, def: 100, hp: 1200 },
-        maxTrust: 3600, trust: 0, isUnlocked: false,
+        maxTrust: 3600, trust: 0, isUnlocked: true, // Prototype starts with one unlocked as supporter
         greeting: '안녕하세요! 에테르가드의 유나입니다. 대화를 통해 서로를 더 알아갔으면 해요.'
     },
     {
@@ -41,7 +41,8 @@ const characters = [
     }
 ];
 
-const managerStats = { atk: 400, acc: 200, crt: 100, def: 300, hp: 1000, maxHp: 1000 };
+const managerBaseStats = { atk: 400, acc: 200, crt: 100, def: 300, hp: 1000, maxHp: 1000 };
+let activeSupporter = characters[0]; // Start with Yuna as supporter
 
 const skills = [
     { id: 'BODY', name: '무력 시위', keywords: ['힘', '파괴', '강함', '무력', '돌직구', '호탕', '친구'] },
@@ -69,10 +70,11 @@ let comboCount = 0;
 let lastHitTime = 0;
 let repeatMap = new Map();
 let isMentalBreak = false;
-let breakTimer = 0;
+let breakTimerFunc = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     initUI();
+    updateRepresentativeMarker();
     startTrustDecay();
 });
 
@@ -81,9 +83,15 @@ function initUI() {
     characters.forEach(char => {
         const icon = document.createElement('div');
         icon.className = 'face-icon';
-        icon.innerHTML = `<span style="font-size: 20px;">${char.avatar}</span>`;
         if (char.isUnlocked) icon.classList.add('unlocked');
-        icon.onclick = () => selectCharacter(char, icon);
+        icon.innerHTML = `<span style="font-size: 20px;">${char.avatar}</span>`;
+        icon.onclick = (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                setRepresentative(char); // Ctrl+Click to set as supporter
+            } else {
+                selectCharacter(char, icon);
+            }
+        };
         slider.appendChild(icon);
     });
 
@@ -96,15 +104,12 @@ function initUI() {
             document.getElementById('current-fp-use').textContent = selectedFpCount;
         };
     });
-    document.querySelector('.fp-btn[data-val="1"]').classList.add('active');
 
-    // Chat
     document.getElementById('send-btn').onclick = handleSend;
     document.getElementById('chat-input').onkeypress = (e) => {
         if (e.key === 'Enter') handleSend();
     };
 
-    // Auto-complete tags
     const tagContainer = document.getElementById('keyword-tags');
     ['#명령', '#논리', '#위로', '#공감', '#칭찬', '#팩트'].forEach(tag => {
         const btn = document.createElement('button');
@@ -113,6 +118,25 @@ function initUI() {
         btn.onclick = () => autoFill(tag);
         tagContainer.appendChild(btn);
     });
+}
+
+function setRepresentative(char) {
+    if (!char.isUnlocked) return;
+    activeSupporter = char;
+    updateRepresentativeMarker();
+    addMessage(`[정보] 대표 캐릭터가 ${char.name}(으)로 변경되었습니다. 스탯 버프가 갱신됩니다.`, 'ai', true);
+}
+
+function updateRepresentativeMarker() {
+    const marker = document.getElementById('representative-marker');
+    const icons = document.querySelectorAll('.face-icon');
+    const idx = characters.findIndex(c => c === activeSupporter);
+    if (idx !== -1 && icons[idx]) {
+        marker.style.display = 'block';
+        const rect = icons[idx].getBoundingClientRect();
+        const sliderRect = document.querySelector('.face-icons').getBoundingClientRect();
+        marker.style.top = `${icons[idx].offsetTop}px`;
+    }
 }
 
 function autoFill(tag) {
@@ -134,7 +158,7 @@ function selectCharacter(char, icon) {
     icon.classList.add('active');
 
     currentTarget = char;
-    currentTarget.currentHp = char.stats.hp; // Reset session HP
+    currentTarget.currentHp = char.stats.hp;
     isMentalBreak = false;
     comboCount = 0;
     repeatMap.clear();
@@ -175,12 +199,12 @@ async function handleSend() {
 }
 
 async function executeCombatLoop(text) {
-    // 1. LLM Delay Masking (Type A)
+    // A. 지연 시간 은폐
     const dummy = addMessage('...', 'ai', true);
-    const pool = ["...", "호오?", "냉철하군.", "계산된 말인가?", "어디 보죠."];
-    dummy.textContent = pool[Math.floor(Math.random() * pool.length)];
+    const dummyPool = ["...", "호오?", "냉철하군.", "계산된 말인가?", "어디 보죠."];
+    dummy.textContent = dummyPool[Math.floor(Math.random() * dummyPool.length)];
 
-    // 2. Skill Roulette (Type B)
+    // B. 스킬 룰렛 연출
     const roulette = document.getElementById('roulette-layer');
     const rouletteItem = document.getElementById('roulette-item');
     roulette.classList.remove('hidden');
@@ -188,45 +212,80 @@ async function executeCombatLoop(text) {
     const matchedSkill = analyzeText(text);
     let rouletteSpin = setInterval(() => {
         rouletteItem.textContent = skills[Math.floor(Math.random() * skills.length)].name;
-    }, 80).
+    }, 80);
 
     await new Promise(r => setTimeout(r, 1200));
     clearInterval(rouletteSpin);
 
-    if (matchedSkill) rouletteItem.textContent = matchedSkill.name;
-    else rouletteItem.textContent = "NORMAL HIT";
+    if (matchedSkill) {
+        rouletteItem.textContent = matchedSkill.name;
+        rouletteItem.style.color = 'var(--accent-gold)';
+    } else {
+        rouletteItem.textContent = "NORMAL HIT";
+        rouletteItem.style.color = 'white';
+    }
 
     await new Promise(r => setTimeout(r, 300));
     roulette.classList.add('hidden');
     dummy.remove();
 
-    // 3. Damage Calculation
+    // C. 데미지 계산 및 전투 공식 적용
     const result = calculateDamage(text, matchedSkill);
 
     if (result.isHit) {
-        processHit(result, matchedSkill);
+        processCombatHit(result, matchedSkill);
     } else {
         showFloatingText("MISS", "slate");
         comboCount = 0;
         updateComboUI();
     }
 
-    // 4. Counterattack (Type C) - Only if not in Break Mode
+    // D. 타겟 반격 (C 타입)
     if (!isMentalBreak && currentTarget.currentHp > 0) {
-        setTimeout(() => {
-            processCounterattack(text);
-        }, 800);
+        setTimeout(() => processTargetCounter(text), 800);
     }
 }
 
-function processHit(res, skill) {
-    // Apply Damage
+function calculateDamage(text, skill) {
+    // Current Stats (Base + Supporter Buff)
+    const currentAtk = managerBaseStats.atk + (activeSupporter ? activeSupporter.stats.atk * 0.2 : 0);
+    const currentAcc = managerBaseStats.acc + (activeSupporter ? activeSupporter.stats.acc * 0.2 : 0);
+    const currentCrt = managerBaseStats.crt + (activeSupporter ? activeSupporter.stats.crt * 0.2 : 0);
+
+    // 1. 명중 판정
+    const synergy = skill ? getSynergy(skill.id, currentTarget.props) : 1.0;
+    const synergyMod = synergy > 1.0 ? 0.5 : (synergy < 1.0 ? 1.5 : 1.0);
+    const hitProb = 70 + (currentAcc * 0.1) - (currentTarget.stats.def * 0.1 * synergyMod);
+    const isHit = Math.random() * 100 < hitProb || (selectedFpCount === 100);
+    if (!isHit) return { isHit: false };
+
+    // 2. 데미지 계산
+    let baseDmg = currentAtk;
+    const critProb = 5 + (currentCrt * 0.1) + (comboCount * 5);
+    const isCrit = Math.random() * 100 < critProb;
+    const critMultiplier = isCrit ? (selectedFpCount === 100 ? 2.0 : 1.5) : 1.0;
+
+    const fpMods = { 1: 1.5, 10: 2.0, 30: 3.0, 50: 4.5, 100: 8.0 };
+    const fpMulti = fpMods[selectedFpCount] || 1.0;
+    inventoryFirePoints -= selectedFpCount;
+    document.getElementById('item-count').textContent = inventoryFirePoints;
+
+    let penalty = 1.0;
+    const count = repeatMap.get(text) || 0;
+    if (count === 1) penalty = 0.5;
+    else if (count === 2) penalty = 0.1;
+    else if (count >= 3) penalty = 0;
+    repeatMap.set(text, count + 1);
+
+    const finalDmg = Math.floor((baseDmg * fpMulti * critMultiplier * synergy * penalty) - currentTarget.stats.def);
+    return { isHit: true, dmg: Math.max(1, finalDmg), isCrit, isImmune: penalty < 0.2 };
+}
+
+function processCombatHit(res, skill) {
     if (isMentalBreak) {
-        // Break Mode: Damage converts to Trust
         currentTarget.trust = Math.min(currentTarget.maxTrust, currentTarget.trust + res.dmg);
         showFloatingText(`+${res.dmg} TRUST`, "gold");
     } else {
-        // Normal Mode: Damage Target HP
         const overDmg = Math.max(0, res.dmg - currentTarget.currentHp);
         currentTarget.currentHp = Math.max(0, currentTarget.currentHp - res.dmg);
 
@@ -235,10 +294,14 @@ function processHit(res, skill) {
             showFloatingText(`+${overDmg} OVERKILL`, "gold");
         }
 
-        showFloatingText(`-${res.dmg}`, res.isCrit ? "red" : "white");
-        if (res.isCrit) showFloatingText("CRITICAL!", "gold");
+        if (res.isImmune) {
+            showFloatingText("IMMUNE!", "#94a3b8");
+        } else {
+            showFloatingText(`-${res.dmg}`, res.isCrit ? "#fbbf24" : "white");
+            if (res.isCrit) showFloatingText("CRITICAL!", "#ef4444");
+        }
 
-        // Combo
+        // 콤보 업데이트
         const now = Date.now();
         if (now - lastHitTime < 3500) {
             comboCount = Math.min(10, comboCount + 1);
@@ -249,49 +312,112 @@ function processHit(res, skill) {
         updateComboUI();
     }
 
-    if (currentTarget.currentHp <= 0 && !isMentalBreak) {
-        enterMentalBreak();
-    }
-
-    shakeScreen(res.isCrit ? 10 : 5);
+    if (currentTarget.currentHp <= 0 && !isMentalBreak) enterMentalBreak();
+    shakeScreen(res.isCrit ? 15 : 5);
     updateUIGauges();
 }
 
-function calculateDamage(text, skill) {
-    // 1. Accuracy Check
-    const accBase = 70;
-    const synergy = skill ? getSynergy(skill.id, currentTarget.props) : 1.0;
-    const mod = synergy > 1.0 ? 0.5 : (synergy < 1.0 ? 1.5 : 1.0);
-    const hitProb = accBase + (managerStats.acc * 0.1) - (currentTarget.stats.def * 0.1 * mod);
+function processTargetCounter(text) {
+    const replies = ["그것이 당신의 한계인가요?", "논리가 빈약하군요.", "후후, 더 노력해 보세요.", "겨우 그 정도로 저를..."];
+    addMessage(replies[Math.floor(Math.random() * replies.length)], 'ai');
 
-    const isHit = Math.random() * 100 < hitProb || (selectedFpCount === 100);
-    if (!isHit) return { isHit: false };
+    let counterDmg = Math.floor(currentTarget.stats.atk * (Math.random() * 0.4 + 0.3));
+    if (text.length < 5 || (repeatMap.get(text) || 0) > 1) {
+        counterDmg *= 2;
+        showFloatingText("COUNTER!!", "#f43f5e");
+    }
 
-    // 2. Base Damage
-    let baseDmg = managerStats.atk;
+    currentManagerHp = Math.max(0, currentManagerHp - counterDmg);
+    updateManagerHpUI();
+    triggerHitEffect();
 
-    // 3. Critical Check
-    const critProb = 5 + (managerStats.crt * 0.1) + (comboCount * 5);
-    const isCrit = Math.random() * 100 < critProb;
-    const critMod = isCrit ? (selectedFpCount === 100 ? 2.0 : 1.5) : 1.0;
+    if (currentManagerHp <= 0) {
+        alert("멘탈 붕괴... 재정비가 필요합니다.");
+        location.reload();
+    }
+}
 
-    // 4. Fire Point Multiplier
-    const fpMods = { 1: 1.5, 10: 2.0, 30: 3.0, 50: 4.5, 100: 8.0 };
-    const fpMulti = fpMods[selectedFpCount] || 1.0;
-    inventoryFirePoints -= selectedFpCount;
-    document.getElementById('item-count').textContent = inventoryFirePoints;
+function updateManagerHpUI() {
+    const pct = (currentManagerHp / managerBaseStats.maxHp) * 100;
+    document.getElementById('user-hp-fill').style.width = `${pct}%`;
+}
 
-    // 5. Repeated Penalty & Tone Analysis
-    let penalty = 1.0;
-    const count = repeatMap.get(text) || 0;
-    if (count === 1) penalty = 0.5;
-    else if (count === 2) penalty = 0.1;
-    else if (count >= 3) penalty = 0;
-    repeatMap.set(text, count + 1);
+function triggerHitEffect() {
+    document.body.classList.add('hit-blink');
+    setTimeout(() => document.body.classList.remove('hit-blink'), 200);
+}
 
-    // 6. Synergy & Results
-    const finalDmg = Math.floor((baseDmg * fpMulti * critMod * synergy * penalty) - currentTarget.stats.def);
-    return { isHit: true, dmg: Math.max(1, finalDmg), isCrit };
+function enterMentalBreak() {
+    isMentalBreak = true;
+    document.querySelector('.main-workspace').classList.add('mental-break');
+    addMessage('...아아, 더는 버틸 수 없군요. 당신이 원하는 대로...', 'ai');
+    showFloatingText('MENTAL BREAK!!', '#a855f7');
+
+    const timerUI = document.getElementById('fever-timer');
+    timerUI.classList.remove('hidden');
+    let timeLeft = 60;
+
+    breakTimerFunc = setInterval(() => {
+        timeLeft--;
+        const m = Math.floor(timeLeft / 60);
+        const s = timeLeft % 60;
+        timerUI.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+        if (timeLeft <= 0 || !currentTarget) {
+            clearInterval(breakTimerFunc);
+            endMentalBreak();
+        }
+    }, 1000);
+}
+
+function endMentalBreak() {
+    isMentalBreak = false;
+    document.querySelector('.main-workspace').classList.remove('mental-break');
+    document.getElementById('fever-timer').classList.add('hidden');
+
+    if (currentTarget.trust >= currentTarget.maxTrust) {
+        currentTarget.isUnlocked = true;
+        addMessage(`[경축] ${currentTarget.name} 캐릭터를 전적으로 섭외했습니다!`, 'ai', true);
+        document.querySelectorAll('.face-icon').forEach((el, i) => {
+            if (characters[i] === currentTarget) el.classList.add('unlocked');
+        });
+    }
+    currentTarget.currentHp = currentTarget.stats.hp;
+    updateUIGauges();
+}
+
+function updateUIGauges() {
+    if (!currentTarget) return;
+    const hpPct = (currentTarget.currentHp / currentTarget.stats.hp) * 100;
+    const trPct = (currentTarget.trust / currentTarget.maxTrust) * 100;
+    document.getElementById('hp-fill').style.width = `${hpPct}%`;
+    document.getElementById('trust-fill').style.width = `${trPct}%`;
+}
+
+function updateComboUI() {
+    const container = document.getElementById('combo-container');
+    const count = document.getElementById('combo-count');
+
+    if (comboCount < 3) {
+        container.classList.add('hidden');
+    } else {
+        container.classList.remove('hidden');
+        count.textContent = comboCount;
+
+        if (comboCount < 5) count.style.color = '#38bdf8';
+        else if (comboCount < 9) count.style.color = '#a855f7';
+        else {
+            count.style.color = '#ef4444';
+            if (comboCount === 10) triggerComboFlash();
+        }
+    }
+}
+
+function triggerComboFlash() {
+    const flash = document.createElement('div');
+    flash.className = 'combo-flash hit-overlay'; // Reusing hit-overlay for sizing
+    document.body.appendChild(flash);
+    setTimeout(() => flash.remove(), 200);
 }
 
 function getSynergy(atkProp, targetProps) {
@@ -310,113 +436,21 @@ function analyzeText(text) {
     return null;
 }
 
-function processCounterattack(text) {
-    const replyPool = ["논점이 빗나갔군요.", "겨우 그 정도로 저를 흔들 수 있겠나요?", "당신의 진심이 의심스럽네요.", "후후, 기대 이하입니다."];
-    addMessage(replyPool[Math.floor(Math.random() * replyPool.length)], 'ai');
-
-    // Counter Damage
-    let dmg = Math.floor(currentTarget.stats.atk * (Math.random() * 0.3 + 0.3));
-    if (text.length < 5 || (repeatMap.get(text) || 0) > 1) {
-        dmg *= 2;
-        showFloatingText("POWER COUNTER!", "purple");
-    }
-
-    currentManagerHp = Math.max(0, currentManagerHp - dmg);
-    document.getElementById('user-hp-fill').style.width = `${(currentManagerHp / managerStats.maxHp) * 100}%`;
-
-    if (currentManagerHp <= 0) {
-        alert("멘탈 붕괴... 재정비가 필요합니다.");
-        location.reload();
-    }
-}
-
-function enterMentalBreak() {
-    isMentalBreak = true;
-    document.querySelector('.main-workspace').classList.add('mental-break');
-    addMessage('...아아, 더는 버틸 수 없군요. 당신이 원하는 대로...', 'ai');
-    showFloatingText('MENTAL BREAK!!', 'purple');
-
-    // Timer Start (1 min)
-    const timerUI = document.getElementById('fever-timer');
-    timerUI.classList.remove('hidden');
-    let timeLeft = 60;
-
-    const interval = setInterval(() => {
-        timeLeft--;
-        const m = Math.floor(timeLeft / 60);
-        const s = timeLeft % 60;
-        timerUI.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-
-        if (timeLeft <= 0 || !currentTarget) {
-            clearInterval(interval);
-            endMentalBreak();
-        }
-    }, 1000);
-}
-
-function endMentalBreak() {
-    isMentalBreak = false;
-    document.querySelector('.main-workspace').classList.remove('mental-break');
-    document.getElementById('fever-timer').classList.add('hidden');
-
-    if (currentTarget.trust >= currentTarget.maxTrust) {
-        currentTarget.isUnlocked = true;
-        addMessage(`[경축] ${currentTarget.name} 캐릭터를 전적으로 섭외했습니다!`, 'ai', true);
-        document.querySelector('.face-icon.active').classList.add('unlocked');
-    } else {
-        addMessage(`전투 종료. 누적 신뢰도: ${currentTarget.trust}/${currentTarget.maxTrust}`, 'ai', true);
-    }
-
-    // Recovery HP for next session
-    currentTarget.currentHp = currentTarget.stats.hp;
-    updateUIGauges();
-}
-
-function updateUIGauges() {
-    if (!currentTarget) return;
-    const hpPct = (currentTarget.currentHp / currentTarget.stats.hp) * 100;
-    const trPct = (currentTarget.trust / currentTarget.maxTrust) * 100;
-
-    document.getElementById('hp-fill').style.width = `${hpPct}%`;
-    document.getElementById('trust-fill').style.width = `${trPct}%`;
-}
-
-function updateComboUI() {
-    const container = document.getElementById('combo-container');
-    const count = document.getElementById('combo-count');
-
-    if (comboCount < 3) {
-        container.classList.add('hidden');
-    } else {
-        container.classList.remove('hidden');
-        count.textContent = comboCount;
-
-        // Color Evolution
-        if (comboCount < 5) count.style.color = '#38bdf8'; // Blue
-        else if (comboCount < 9) count.style.color = '#a855f7'; // Violet
-        else count.style.color = '#ef4444'; // Red
-
-        // Vibration on 10+
-        if (comboCount === 10) count.classList.add('vibrate');
-    }
-}
-
 function startTrustDecay() {
     setInterval(() => {
         characters.forEach(char => {
             if (char.isUnlocked && char.trust > 0) {
-                char.trust = Math.max(0, char.trust - 1); // 1 pt decay
-                if (char.trust === 0) {
+                char.trust = Math.max(0, char.trust - 1);
+                if (char.trust === 0 && char !== characters[0]) { // Don't lock Yuna in prototype
                     char.isUnlocked = false;
-                    // Update UI if current char lost trust
-                    if (currentTarget === char) {
-                        updateUIGauges();
-                        addMessage(`[경고] ${char.name}님과의 신뢰가 바닥나 우리 팀을 떠났습니다.`, 'ai', true);
-                    }
+                    document.querySelectorAll('.face-icon').forEach((el, i) => {
+                        if (characters[i] === char) el.classList.remove('unlocked');
+                    });
                 }
             }
         });
-    }, 120000); // Every 2 min for prototype (Normally much slower)
+        updateUIGauges();
+    }, 60000);
 }
 
 function showFloatingText(text, color) {
@@ -428,14 +462,14 @@ function showFloatingText(text, color) {
     div.style.top = `${30 + Math.random() * 20}%`;
     div.style.color = color;
     fx.appendChild(div);
-    setTimeout(() => div.remove(), 1000);
+    setTimeout(() => div.remove(), 800);
 }
 
 function shakeScreen(intensity) {
     const workspace = document.querySelector('.main-workspace');
-    workspace.style.animation = `none`;
+    workspace.style.animation = 'none';
     setTimeout(() => {
-        workspace.style.animation = `screenShake ${intensity / 100}s infinite`;
+        workspace.style.animation = `vibrate 0.1s infinite`;
         setTimeout(() => workspace.style.animation = 'none', 300);
     }, 10);
 }

@@ -48,11 +48,76 @@ body {
     border-right: 1px solid var(--border-light);
 }
 
-.slider-logo {
-    font-weight: 700;
-    color: var(--accent-blue);
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
+/* Manager Mini Info */
+.manager-mini-info {
+    width: 100%;
+    padding: 0.5rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 1.5rem;
+}
+
+.mgr-header {
+    font-size: 0.7rem;
+    font-weight: 800;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.mgr-header .lvl {
+    color: var(--accent-gold);
+}
+
+.mgr-header .name {
+    letter-spacing: 1px;
+    color: var(--text-slate);
+}
+
+/* Face Icons with Marker */
+.face-icons-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.marker {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #ef4444;
+    font-size: 14px;
+    animation: bounceMarker 1s infinite;
+    z-index: 101;
+    pointer-events: none;
+    display: none;
+    /* Shown via JS */
+}
+
+@keyframes bounceMarker {
+
+    0%,
+    100% {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    50% {
+        transform: translateX(-50%) translateY(-5px);
+    }
+}
+
+.face-icon.unlocked {
+    opacity: 0.9;
+}
+
+.face-icon.unlocked::after {
+    content: '⭐';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 10px;
 }
 
 .face-icons {
@@ -101,6 +166,49 @@ body {
     flex: 1;
     position: relative;
     background: #000;
+}
+
+/* Screen Effects */
+.hit-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0 solid rgba(239, 68, 68, 0);
+    pointer-events: none;
+    z-index: 1000;
+    transition: border-width 0.1s, border-color 0.1s;
+}
+
+.hit-blink {
+    border: 20px solid rgba(239, 68, 68, 0.4);
+}
+
+.combo-flash {
+    animation: flashWhite 0.2s ease-out;
+}
+
+@keyframes flashWhite {
+    0% {
+        background: white;
+        opacity: 0.8;
+    }
+
+    100% {
+        background: transparent;
+        opacity: 0;
+    }
+}
+
+#fx-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2000;
 }
 
 .character-bg-layer {
