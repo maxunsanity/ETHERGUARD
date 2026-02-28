@@ -48,97 +48,90 @@
             <div class="interface-overlay">
                 <!-- Top Header: Stats & Gauges -->
                 <header class="battle-header glass">
-                    <div class="top-bar">
-                        <div class="char-info">
+                    <div class="target-profile">
+                        <div class="target-name-container">
                             <span id="target-name">Character Name</span>
-                            <div id="hp-fill"></div>
+                            <span id="target-trait" class="trait-tag">Trait</span>
+                            <div id="fever-timer" class="hidden">01:00</div>
                         </div>
-                        <button id="matrix-btn" title="Synergy Matrix" class="icon-btn">📊</button>
-                    </div>
-                    <div class="gauge-group">
-                        <label>TRUST / AFFINITY</label>
-                        <div class="gauge-bar trust">
-                            <div id="trust-fill"></div>
+                        <div class="gauges">
+                            <div class="gauge-group">
+                                <label>MENTAL (HP)</label>
+                                <div class="gauge-bar hp">
+                                    <div id="hp-fill"></div>
+                                </div>
+                            </div>
+                            <div class="gauge-group">
+                                <label>TRUST / AFFINITY</label>
+                                <div class="gauge-bar trust">
+                                    <div id="trust-fill"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </header>
+
+                <!-- Middle: Chat Area -->
+                <div class="chat-container">
+                    <!-- Combo Overlay -->
+                    <div id="combo-container" class="hidden">
+                        <span id="combo-count">0</span>
+                        <span class="combo-label">COMBO!</span>
+                    </div>
+
+                    <!-- Skill Roulette Animation Layer -->
+                    <div id="roulette-layer" class="hidden">
+                        <div class="roulette-wheel">
+                            <div id="roulette-item">WAITING...</div>
+                        </div>
+                    </div>
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="empty-state">좌측 슬라이드바에서 인물을 선택하세요.</div>
+                    </div>
+                </div>
+
+                <!-- Bottom: Skills & Input -->
+                <footer class="battle-footer glass">
+                    <div class="footer-top">
+                        <div class="skill-controls">
+                            <div class="skill-slots" id="skill-slots">
+                                <div class="skill-item" title="발화점">
+                                    <span class="skill-icon">🔥</span>
+                                    <span class="skill-count" id="item-count">10000</span>
+                                </div>
+                            </div>
+                            <div class="firepoint-selector">
+                                <button class="fp-btn" data-val="1">x1</button>
+                                <button class="fp-btn" data-val="10">x10</button>
+                                <button class="fp-btn" data-val="100">MAX</button>
+                                <span class="fp-label">소모량: <span id="current-fp-use">1</span></span>
+                            </div>
+                        </div>
+                        <div class="user-info">
+                            <span class="label">MANAGER MENTAL</span>
+                            <div class="mini-gauge">
+                                <div id="user-hp-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="keyword-tags" id="keyword-tags">
+                        <!-- Auto-complete tags will be here -->
+                    </div>
+
+                    <div class="input-wrapper">
+                        <input type="text" id="chat-input" placeholder="메시지를 입력하여 설득을 시작하세요..." disabled>
+                        <button id="send-btn" disabled>SEND</button>
+                    </div>
+                </footer>
             </div>
         </div>
-        </header>
-
-        <!-- Middle: Chat Area -->
-        <div class="chat-container">
-            <!-- Combo Overlay -->
-            <div id="combo-container" class="hidden">
-                <span id="combo-count">0</span>
-                <span class="combo-label">COMBO!</span>
-            </div>
-
-            <!-- Skill Roulette Animation Layer -->
-            <div id="roulette-layer" class="hidden">
-                <div class="roulette-wheel">
-                    <div id="roulette-item">WAITING...</div>
-                </div>
-            </div>
-            <div class="chat-messages" id="chat-messages">
-                <div class="empty-state">좌측 슬라이드바에서 인물을 선택하세요.</div>
-            </div>
-        </div>
-
-        <!-- Bottom: Skills & Input -->
-        <footer class="battle-footer glass">
-            <div class="footer-top">
-                <div class="skill-controls">
-                    <div class="skill-slots" id="skill-slots">
-                        <div class="skill-item" title="발화점">
-                            <span class="skill-icon">🔥</span>
-                            <span class="skill-count" id="item-count">10000</span>
-                        </div>
-                    </div>
-                    <div class="firepoint-selector">
-                        <button class="fp-btn" data-val="1">x1</button>
-                        <button class="fp-btn" data-val="10">x10</button>
-                        <button class="fp-btn" data-val="100">MAX</button>
-                        <span class="fp-label">소모량: <span id="current-fp-use">1</span></span>
-                    </div>
-                </div>
-                <div class="user-info">
-                    <span class="label">MANAGER MENTAL</span>
-                    <div class="mini-gauge">
-                        <div id="user-hp-fill"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="keyword-tags" id="keyword-tags">
-                <!-- Auto-complete tags will be here -->
-            </div>
-
-            <div class="input-wrapper">
-                <input type="text" id="chat-input" placeholder="메시지를 입력하여 설득을 시작하세요..." disabled>
-                <button id="send-btn" disabled>SEND</button>
-            </div>
-        </footer>
-    </div>
-    </div>
     </div>
 
     <!-- Floating Effects Container -->
     <div id="fx-container"></div>
 
     <script src="main.js"></script>
-    <!-- Synergy Matrix Popup -->
-    <div id="matrix-popup" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <h2>SYNERGY MATRIX</h2>
-            <div class="matrix-grid" id="matrix-grid">
-                <!-- Generated by JS -->
-            </div>
-            <div class="target-weakness" id="target-weakness-info">
-                <!-- Current target weakness tips -->
-            </div>
-        </div>
-    </div>
 </body>
 
 </html>

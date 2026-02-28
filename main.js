@@ -17,44 +17,49 @@ const CONFIG = {
 // Character Data
 const characters = [
     {
-        id: 'yuna', name: '유나 (유비)', trait: '성실·학생회장', avatar: '🎓',
-        bg: 'yuna_bg.png', hit_bg: 'yuna_hit.png', panic_bg: 'yuna_panic.png',
+        id: 'yuna', name: '유나 (유비)', trait: '성실·학생회장', avatar: '🎓', bg: 'yuna_bg.png',
         archetype: '공감하는 리더', props: ['HEART', 'BODY'],
         stats: { atk: 320, acc: 300, crt: 150, def: 100, hp: 12000 },
-        maxTrust: 36000, trust: 0, isUnlocked: true,
-        greeting: '안녕하세요! 에테르가드의 유나입니다. 대화를 통해 서로를 더 알아갔으면 해요.'
+        maxTrust: 36000, trust: 0, isUnlocked: true, isRecruited: false, hasFailedBefore: false,
+        greeting: '안녕하세요! 에테르가드의 유나입니다. 대화를 통해 서로를 더 알아갔으면 해요.',
+        recruitedGreeting: '디렉터님, 다시 만나뵈어 영광이에요! 무엇이든 도와드리겠습니다.',
+        failedGreeting: '또 오셨군요... 이번에는 좀 더 진심을 보여주실 건가요?'
     },
     {
-        id: 'kwan', name: '민주 (관우)', trait: '과묵·검도부', avatar: '🗡️',
-        bg: 'kwan_bg.png', hit_bg: 'kwan_hit.png', panic_bg: 'kwan_panic.png',
+        id: 'kwan', name: '민주 (관우)', trait: '과묵·검도부', avatar: '🗡️', bg: 'kwan_bg.png',
         archetype: '직관적인 통찰가', props: ['LOGIC', 'MYSTIC'],
         stats: { atk: 480, acc: 200, crt: 100, def: 200, hp: 12000 },
-        maxTrust: 36000, trust: 0, isUnlocked: false,
-        greeting: '...검의 길만큼 대화도 정직해야 하는 법. 무엇을 원하나?'
+        maxTrust: 36000, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false,
+        greeting: '...검의 길만큼 대화도 정직해야 하는 법. 무엇을 원하나?',
+        recruitedGreeting: '디렉터님의 의리... 인정하겠습니다. 검은 당신의 뜻에 따르겠소.',
+        failedGreeting: '또 왔는가... 진심이 아닌 말에는 검으로 답하겠다.'
     },
     {
-        id: 'jang', name: '지희 (장비)', trait: '활발·스트릿', avatar: '🔥',
-        bg: 'jang_bg.png', hit_bg: 'jang_hit.png', panic_bg: 'jang_panic.png',
+        id: 'jang', name: '지희 (장비)', trait: '활발·스트릿', avatar: '🔥', bg: 'jang_bg.png',
         archetype: '독불장군 투사', props: ['BODY'],
         stats: { atk: 250, acc: 150, crt: 50, def: 50, hp: 12000 },
-        maxTrust: 36000, trust: 0, isUnlocked: false,
-        greeting: '헤이! 오늘 텐션 장난 아닌데? 나랑 한판 붙어볼래? 히히!'
+        maxTrust: 36000, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false,
+        greeting: '헤이! 오늘 텐션 장난 아닌데? 나랑 한판 붙어볼래? 히히!',
+        recruitedGreeting: '보스! 이제 한 팀이잖아~ 뭐든 시켜줘, 히히!',
+        failedGreeting: '뭐야 또 왔어? 지난번엔 좀 실망이었는데... 이번엔 제대로 해봐!'
     },
     {
-        id: 'sora', name: '소라 (조조)', trait: '냉철·엘리트', avatar: '🍷',
-        bg: 'sora_bg.png', hit_bg: 'sora_hit.png', panic_bg: 'sora_panic.png',
+        id: 'sora', name: '소라 (조조)', trait: '냉철·엘리트', avatar: '🍷', bg: 'sora_bg.png',
         archetype: '냉혹한 전략가', props: ['LOGIC', 'BODY'],
         stats: { atk: 420, acc: 280, crt: 250, def: 150, hp: 12000 },
-        maxTrust: 36000, trust: 0, isUnlocked: false,
-        greeting: '당신의 논리가 내 시간을 뺏을 만큼 가치 있기를 바랍니다.'
+        maxTrust: 36000, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false,
+        greeting: '당신의 논리가 내 시간을 뺏을 만큼 가치 있기를 바랍니다.',
+        recruitedGreeting: '디렉터님, 당신의 전략적 판단... 인정합니다. 함께하겠습니다.',
+        failedGreeting: '또 찾아왔군요. 지난번 논리는 매우 실망스러웠는데, 발전이 있기를.'
     },
     {
-        id: 'seola', name: '설아 (제갈량)', trait: '천재·사서', avatar: '📖',
-        bg: 'seola_bg.png', hit_bg: 'seola_hit.png', panic_bg: 'seola_panic.png',
+        id: 'seola', name: '설아 (제갈량)', trait: '천재·사서', avatar: '📖', bg: 'seola_bg.png',
         archetype: '철두철미한 분석가', props: ['LOGIC'],
         stats: { atk: 350, acc: 350, crt: 300, def: 100, hp: 12000 },
-        maxTrust: 36000, trust: 0, isUnlocked: false,
-        greeting: '지혜로운 자는 말을 아끼지만, 꼭 필요할 땐 예리한 법이죠.'
+        maxTrust: 36000, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false,
+        greeting: '지혜로운 자는 말을 아끼지만, 꼭 필요할 땐 예리한 법이죠.',
+        recruitedGreeting: '디렉터님, 제 지혜가 필요하신 거죠? 기꺼이 함께하겠습니다.',
+        failedGreeting: '다시 오셨군요... 지난번 대화의 논리적 허점은 개선되었나요?'
     }
 ];
 
@@ -100,16 +105,10 @@ const ALL_TAGS = ['#명령', '#논리', '#위로', '#공감', '#칭찬', '#팩�
 
 function initUI() {
     const slider = document.getElementById('face-icons');
-    slider.innerHTML = ''; // Clear for re-rendering if needed
-
     characters.forEach(char => {
         const icon = document.createElement('div');
         icon.className = 'face-icon';
-        icon.dataset.id = char.id;
-
         if (char.isUnlocked) icon.classList.add('unlocked');
-        if (char.trust >= char.maxTrust) icon.classList.add('recruited');
-
         icon.innerHTML = `<span style="font-size: 20px;">${char.avatar}</span>`;
         icon.onclick = (e) => {
             if (e.ctrlKey || e.metaKey) {
@@ -253,10 +252,8 @@ function autoFill(tag) {
 
 function selectCharacter(char, icon) {
     if (currentTarget === char) return;
-    if (icon) {
-        document.querySelectorAll('.face-icon').forEach(el => el.classList.remove('active'));
-        icon.classList.add('active');
-    }
+    document.querySelectorAll('.face-icon').forEach(el => el.classList.remove('active'));
+    if (icon) icon.classList.add('active');
 
     currentTarget = char;
     currentTarget.currentHp = char.stats.hp;
@@ -264,10 +261,7 @@ function selectCharacter(char, icon) {
     comboCount = 0;
     repeatMap.clear();
 
-    const bgLayer = document.getElementById('character-bg');
-    bgLayer.style.backgroundImage = `url('${char.bg}')`;
-    bgLayer.className = 'character-bg-layer live-bg'; // Apply to all
-
+    document.getElementById('character-bg').style.backgroundImage = `url('${char.bg}')`;
     document.getElementById('target-name').textContent = char.name;
     document.getElementById('target-trait').textContent = char.trait;
     document.querySelector('.main-workspace').classList.remove('mental-break');
@@ -278,7 +272,17 @@ function selectCharacter(char, icon) {
     document.getElementById('chat-input').disabled = false;
     document.getElementById('send-btn').disabled = false;
     document.getElementById('chat-messages').innerHTML = '';
-    addMessage(char.greeting, 'ai');
+
+    // Feature 3 & 6: Different greetings based on recruitment state
+    let greetingMsg;
+    if (char.isRecruited) {
+        greetingMsg = char.recruitedGreeting;
+    } else if (char.hasFailedBefore) {
+        greetingMsg = char.failedGreeting;
+    } else {
+        greetingMsg = char.greeting;
+    }
+    addMessage(greetingMsg, 'ai');
 }
 
 function addMessage(text, sender, isDummy = false) {
@@ -395,38 +399,26 @@ function processCombatHit(res, skill) {
         currentTarget.trust = Math.min(currentTarget.maxTrust, currentTarget.trust + res.dmg);
         showFloatingText(`+${res.dmg} TRUST`, "gold");
 
-        // Instant check for early completion
+        // Feature 1: Trust 100% → 즉시 획득 (타이머 무시)
         if (currentTarget.trust >= currentTarget.maxTrust) {
             if (breakTimerFunc) clearInterval(breakTimerFunc);
             endMentalBreak();
-            return; // Exit early as target is switched
+            return;
         }
     } else {
-        // 100 Firepoints Impact Effect
-        if (selectedFpCount === 100) {
-            showImpactText(selectedFpCount);
+        const overDmg = Math.max(0, res.dmg - currentTarget.currentHp);
+        currentTarget.currentHp = Math.max(0, currentTarget.currentHp - res.dmg);
+
+        if (overDmg > 0) {
+            currentTarget.trust = Math.min(currentTarget.maxTrust, currentTarget.trust + overDmg);
+            showFloatingText(`+${overDmg} OVERKILL`, "gold");
         }
 
-        // Dynamic Typography with Direction & Filter Effects
-        if (skill) {
-            if (res.isCrit) {
-                showFloatingText(`CRITICAL! -${res.dmg}`, 'gold', 'crit');
-                applyFilter('anger');
-            } else {
-                showFloatingText(`${skill.name} -${res.dmg}`, '#38bdf8', 'skill');
-            }
+        if (res.isImmune) {
+            showFloatingText("IMMUNE!", "#94a3b8");
         } else {
-            if (res.isImmune) {
-                showFloatingText("IMMUNE!", "#94a3b8", 'chat');
-            } else {
-                showFloatingText(`-${res.dmg}`, res.isCrit ? "#fbbf24" : "white", 'chat');
-                if (res.isCrit) {
-                    showFloatingText("CRITICAL!", "#ef4444", 'chat');
-                    applyFilter('anger');
-                } else if (Math.random() < 0.2) {
-                    applyFilter('anger', 500); // Occasional anger flash for normal hits
-                }
-            }
+            showFloatingText(`-${res.dmg}`, res.isCrit ? "#fbbf24" : "white");
+            if (res.isCrit) showFloatingText("CRITICAL!", "#ef4444");
         }
 
         // 콤보 업데이트
@@ -434,7 +426,7 @@ function processCombatHit(res, skill) {
         if (now - lastHitTime < CONFIG.COMBO_TIMEOUT) {
             comboCount++;
             if (comboCount > CONFIG.COMBO_MAX) {
-                comboCount = 1; // 10 이후 초기화 (1부터 다시 시작)
+                comboCount = 1;
             }
         } else {
             comboCount = 1;
@@ -442,7 +434,6 @@ function processCombatHit(res, skill) {
         lastHitTime = now;
         updateComboUI();
 
-        // 10콤보 시 특수 효과 (캐릭터 떨림)
         if (comboCount === CONFIG.COMBO_MAX) {
             document.querySelector('.main-workspace').classList.add('combo-max-vibrate');
         } else {
@@ -450,21 +441,19 @@ function processCombatHit(res, skill) {
         }
     }
 
-    if (currentTarget.currentHp <= 0 && !isMentalBreak) {
-        enterMentalBreak();
-        applyFilter('panic');
-
-        // 멘탈 붕괴 이미지 적용 (존재 시)
-        if (currentTarget.panic_bg) {
-            updateCharacterImage(currentTarget.panic_bg);
-        }
-    }
+    if (currentTarget.currentHp <= 0 && !isMentalBreak) enterMentalBreak();
     shakeScreen(res.isCrit ? 15 : 5);
     updateUIGauges();
 }
 
 function processTargetCounter(text) {
-    const replies = ["그것이 당신의 한계인가요?", "논리가 빈약하군요.", "후후, 더 노력해 보세요.", "겨우 그 정도로 저를..."];
+    // Feature 2: 섭외 완료된 캐릭터는 공손한 말투로 반격
+    let replies;
+    if (currentTarget.isRecruited) {
+        replies = ["디렉터님, 좀 더 설득력 있는 말씀을 부탁드립니다.", "존경하지만... 그 말씀은 조금 아쉽네요.", "디렉터님의 기대에 부응하고 싶습니다.", "더 좋은 방법이 있을 것 같아요."];
+    } else {
+        replies = ["그것이 당신의 한계인가요?", "논리가 빈약하군요.", "후후, 더 노력해 보세요.", "겨우 그 정도로 저를..."];
+    }
     addMessage(replies[Math.floor(Math.random() * replies.length)], 'ai');
 
     let counterDmg = Math.floor(currentTarget.stats.atk * (Math.random() * 0.4 + 0.3));
@@ -521,16 +510,13 @@ function endMentalBreak() {
     document.querySelector('.main-workspace').classList.remove('mental-break');
     document.getElementById('fever-timer').classList.add('hidden');
 
-    // Recruitment Check (Trust 100%)
     if (currentTarget.trust >= currentTarget.maxTrust) {
-        // Success message and UI update (regardless of prior unlocked state)
-        const wasUnlocked = currentTarget.isUnlocked;
+        // Feature 1 & 4: 즉시 획득 + 노란 테두리
         currentTarget.isUnlocked = true;
-
-        // Only show success message if it's the 'first' time reaching 100% in this session 
-        // OR better: always show if it's considered a 'recruitment' success.
+        currentTarget.isRecruited = true;
         addMessage(`[경축] ${currentTarget.name} 캐릭터를 전적으로 섭외했습니다!`, 'ai', true);
 
+        // Feature 4: 노란 테두리
         document.querySelectorAll('.face-icon').forEach((el, i) => {
             if (characters[i].id === currentTarget.id) {
                 el.classList.add('unlocked');
@@ -538,28 +524,26 @@ function endMentalBreak() {
             }
         });
 
-        // Auto switch logic: Look for target with trust < maxTrust
+        // Feature 2: 섭외 완료 캐릭터가 공손하게 대답
+        addMessage(currentTarget.recruitedGreeting, 'ai');
+
+        // Feature 5: 다음 미섭외 캐릭터로 자동 이동
         setTimeout(() => {
-            const nextTarget = characters.find(c => c.trust < c.maxTrust);
+            const nextTarget = characters.find(c => !c.isRecruited && c !== currentTarget);
             if (nextTarget) {
                 const nextIcon = document.querySelector(`.face-icon[data-id="${nextTarget.id}"]`);
-                selectCharacter(nextTarget, nextIcon);
-                // Post-switch message
-                setTimeout(() => {
-                    addMessage(`[안내] 섭외 성공! 다음 타겟인 ${nextTarget.name}님에게로 자동 이동되었습니다.`, 'ai', true);
-                }, 400);
+                addMessage(`[안내] 섭외 성공! 다음 타겟 ${nextTarget.name}님에게로 이동합니다.`, 'ai', true);
+                setTimeout(() => selectCharacter(nextTarget, nextIcon), 800);
             } else {
-                // ALL CLEAR STATE
-                showMissionClear();
+                // 모든 캐릭터 섭외 완료
+                addMessage(`[SYSTEM] ★ MISSION CLEAR ★ 모든 캐릭터를 섭외했습니다!`, 'ai', true);
             }
-        }, 600); // Faster transition (1500 -> 600)
+        }, 1500);
+    } else {
+        // Feature 6: 섭외 실패 표시
+        currentTarget.hasFailedBefore = true;
     }
     currentTarget.currentHp = currentTarget.stats.hp;
-    document.getElementById('target-bg').classList.remove('panic');
-
-    // 일반 상태로 복구
-    updateCharacterImage(currentTarget.bg);
-
     updateUIGauges();
 }
 
@@ -569,26 +553,6 @@ function updateUIGauges() {
     const trPct = (currentTarget.trust / currentTarget.maxTrust) * 100;
     document.getElementById('hp-fill').style.width = `${hpPct}%`;
     document.getElementById('trust-fill').style.width = `${trPct}%`;
-
-    // Real-time recruitment check for UI
-    if (currentTarget.trust >= currentTarget.maxTrust) {
-        const icon = document.querySelector(`.face-icon[data-id="${currentTarget.id}"]`);
-        if (icon) icon.classList.add('recruited');
-    }
-}
-
-function showMissionClear() {
-    addMessage(`[SYSTEM] ★ MISSION CLEAR ★ 모든 캐릭터를 섭외했습니다!`, 'ai', true);
-    const overlay = document.createElement('div');
-    overlay.className = 'mission-clear-overlay';
-    overlay.innerHTML = `
-        <div class="clear-content">
-            <h1>MISSION CLEAR</h1>
-            <p>모든 에테르가드 대원을 소집했습니다.</p>
-            <button onclick="this.parentElement.parentElement.remove()">CONTINUE</button>
-        </div>
-    `;
-    document.body.appendChild(overlay);
 }
 
 function updateComboUI() {
@@ -650,123 +614,17 @@ function startTrustDecay() {
     }, CONFIG.TRUST_DECAY_INTERVAL);
 }
 
-function showFloatingText(text, color, animType = 'chat') {
+function showFloatingText(text, color) {
     const fx = document.getElementById('fx-container');
     const div = document.createElement('div');
-    div.className = `damage-text ${animType}-anim`;
+    div.className = 'damage-text';
     div.textContent = text;
-
-    if (animType === 'chat') {
-        div.style.left = `${40 + Math.random() * 20}%`;
-        div.style.top = `${30 + Math.random() * 20}%`;
-    } else {
-        // Skill or Crit text usually centered vertically
-        div.style.left = `0`;
-        div.style.width = `100%`;
-        div.style.textAlign = `center`;
-        div.style.top = `40%`;
-        div.style.fontSize = `3rem`;
-    }
-
+    div.style.left = `${40 + Math.random() * 20}%`;
+    div.style.top = `${30 + Math.random() * 20}%`;
     div.style.color = color;
     fx.appendChild(div);
-
-    const duration = (animType === 'chat') ? 1000 : 2000;
-    setTimeout(() => div.remove(), duration);
+    setTimeout(() => div.remove(), 800);
 }
-
-function showImpactText(count) {
-    const div = document.createElement('div');
-    div.className = 'impact-text';
-    div.textContent = `x${count}`;
-    document.body.appendChild(div);
-    setTimeout(() => div.remove(), 600);
-}
-
-function applyFilter(type, duration = 1000) {
-    const bg = document.getElementById('target-bg');
-    bg.classList.add(type);
-
-    // 캐릭터 타격(Hit) 상태 이미지 전환
-    if (type === 'anger' && currentTarget.hit_bg) {
-        updateCharacterImage(currentTarget.hit_bg);
-        setTimeout(() => {
-            // Panic(붕괴) 상태가 아니라면 일반으로 복구
-            if (!isMentalBreak) updateCharacterImage(currentTarget.bg);
-        }, 2000); // 2초 유지
-    }
-
-    // Also show a screen flash overlay
-    const overlay = document.createElement('div');
-    overlay.className = `hit-overlay ${type}-tint`;
-    document.body.appendChild(overlay);
-
-    setTimeout(() => {
-        bg.classList.remove(type);
-        overlay.remove();
-    }, duration);
-}
-
-function updateCharacterImage(src) {
-    // Update Background (Removing IDLE animation classes)
-    const bg = document.getElementById('target-bg');
-    bg.src = src;
-    bg.className = ''; // IDLE 삭제
-}
-
-// Matrix Logic
-function initMatrixLogic() {
-    const matrixBtn = document.getElementById('matrix-btn');
-    if (!matrixBtn) return;
-
-    matrixBtn.addEventListener('click', () => {
-        const popup = document.getElementById('matrix-popup');
-        const grid = document.getElementById('matrix-grid');
-        const weakInfo = document.getElementById('target-weakness-info');
-
-        grid.innerHTML = '';
-        Object.entries(synergyMap).forEach(([prop, data]) => {
-            const item = document.createElement('div');
-            item.className = 'matrix-item';
-            item.innerHTML = `<strong>${prop}</strong><br>
-                <span style="color:#22c55e">▶ ${data.strong}</span><br>
-                <span style="color:#ef4444">◀ ${data.weak}</span>`;
-            grid.appendChild(item);
-        });
-
-        if (currentTarget) {
-            const weaknesses = [];
-            Object.entries(synergyMap).forEach(([prop, data]) => {
-                const targetProps = currentTarget.props || [];
-                if (targetProps.includes(data.strong)) {
-                    weaknesses.push(`<span style="color:gold;font-weight:bold">${prop}</span>`);
-                }
-            });
-            weakInfo.innerHTML = `<strong>TARGET ANALYSIS:</strong><br>
-                지금 상대인 ${currentTarget.name}님은 ${weaknesses.length > 0 ? weaknesses.join(', ') : '특별한'} 속성 키워드에 취약합니다.`;
-        }
-
-        popup.classList.remove('hidden');
-    });
-
-    const closeBtn = document.querySelector('.close-btn');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            document.getElementById('matrix-popup').classList.add('hidden');
-        });
-    }
-
-    window.onclick = (event) => {
-        const popup = document.getElementById('matrix-popup');
-        if (event.target == popup) popup.classList.add('hidden');
-    }
-}
-
-// Initialize Matrix on setup
-document.addEventListener('DOMContentLoaded', () => {
-    // Other init calls...
-    initMatrixLogic();
-});
 
 function shakeScreen(intensity) {
     const workspace = document.querySelector('.main-workspace');
