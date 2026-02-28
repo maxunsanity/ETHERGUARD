@@ -95,10 +95,16 @@ const ALL_TAGS = ['#명령', '#논리', '#위로', '#공감', '#칭찬', '#팩�
 
 function initUI() {
     const slider = document.getElementById('face-icons');
+    slider.innerHTML = ''; // Clear for re-rendering if needed
+
     characters.forEach(char => {
         const icon = document.createElement('div');
         icon.className = 'face-icon';
+        icon.dataset.id = char.id;
+
         if (char.isUnlocked) icon.classList.add('unlocked');
+        if (char.trust >= char.maxTrust) icon.classList.add('recruited');
+
         icon.innerHTML = `<span style="font-size: 20px;">${char.avatar}</span>`;
         icon.onclick = (e) => {
             if (e.ctrlKey || e.metaKey) {
@@ -251,7 +257,11 @@ function selectCharacter(char, icon) {
     comboCount = 0;
     repeatMap.clear();
 
-    document.getElementById('character-bg').style.backgroundImage = `url('${char.bg}')`;
+    const bgLayer = document.getElementById('character-bg');
+    bgLayer.style.backgroundImage = `url('${char.bg}')`;
+    bgLayer.className = 'character-bg-layer'; // Class Reset
+    if (char.id === 'yuna') bgLayer.classList.add('live-bg');
+
     document.getElementById('target-name').textContent = char.name;
     document.getElementById('target-trait').textContent = char.trait;
     document.querySelector('.main-workspace').classList.remove('mental-break');
@@ -482,7 +492,10 @@ function endMentalBreak() {
         currentTarget.isUnlocked = true;
         addMessage(`[경축] ${currentTarget.name} 캐릭터를 전적으로 섭외했습니다!`, 'ai', true);
         document.querySelectorAll('.face-icon').forEach((el, i) => {
-            if (characters[i] === currentTarget) el.classList.add('unlocked');
+            if (characters[i] === currentTarget) {
+                el.classList.add('unlocked');
+                el.classList.add('recruited');
+            }
         });
     }
     currentTarget.currentHp = currentTarget.stats.hp;
@@ -495,6 +508,12 @@ function updateUIGauges() {
     const trPct = (currentTarget.trust / currentTarget.maxTrust) * 100;
     document.getElementById('hp-fill').style.width = `${hpPct}%`;
     document.getElementById('trust-fill').style.width = `${trPct}%`;
+
+    // Real-time recruitment check for UI
+    if (currentTarget.trust >= currentTarget.maxTrust) {
+        const icon = document.querySelector(`.face-icon[data-id="${currentTarget.id}"]`);
+        if (icon) icon.classList.add('recruited');
+    }
 }
 
 function updateComboUI() {
