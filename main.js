@@ -248,8 +248,10 @@ function autoFill(tag) {
 
 function selectCharacter(char, icon) {
     if (currentTarget === char) return;
-    document.querySelectorAll('.face-icon').forEach(el => el.classList.remove('active'));
-    icon.classList.add('active');
+    if (icon) {
+        document.querySelectorAll('.face-icon').forEach(el => el.classList.remove('active'));
+        icon.classList.add('active');
+    }
 
     currentTarget = char;
     currentTarget.currentHp = char.stats.hp;
@@ -494,29 +496,38 @@ function endMentalBreak() {
     document.querySelector('.main-workspace').classList.remove('mental-break');
     document.getElementById('fever-timer').classList.add('hidden');
 
+    // Recruitment Check (Trust 100%)
     if (currentTarget.trust >= currentTarget.maxTrust) {
-        if (!currentTarget.isUnlocked) {
-            currentTarget.isUnlocked = true;
-            addMessage(`[경축] ${currentTarget.name} 캐릭터를 전적으로 섭외했습니다!`, 'ai', true);
-            document.querySelectorAll('.face-icon').forEach((el, i) => {
-                if (characters[i].id === currentTarget.id) {
-                    el.classList.add('unlocked');
-                    el.classList.add('recruited');
-                }
-            });
+        // Success message and UI update (regardless of prior unlocked state)
+        const wasUnlocked = currentTarget.isUnlocked;
+        currentTarget.isUnlocked = true;
 
-            // Auto switch to next un-recruited character
-            setTimeout(() => {
-                const nextTarget = characters.find(c => !c.isUnlocked);
-                if (nextTarget) {
-                    addMessage(`[안내] 다음 타겟인 ${nextTarget.name}님에게로 이동합니다.`, 'ai', true);
-                    const nextIcon = document.querySelector(`.face-icon[data-id="${nextTarget.id}"]`);
-                    selectCharacter(nextTarget, nextIcon);
-                } else {
-                    addMessage(`[정보] 모든 캐릭터를 섭외 완료했습니다! 당신은 진정한 에테르가드 마스터입니다.`, 'ai', true);
-                }
-            }, 1500);
-        }
+        // Only show success message if it's the 'first' time reaching 100% in this session 
+        // OR better: always show if it's considered a 'recruitment' success.
+        addMessage(`[경축] ${currentTarget.name} 캐릭터를 전적으로 섭외했습니다!`, 'ai', true);
+
+        document.querySelectorAll('.face-icon').forEach((el, i) => {
+            if (characters[i].id === currentTarget.id) {
+                el.classList.add('unlocked');
+                el.classList.add('recruited');
+            }
+        });
+
+        // Auto switch logic: Look for target with trust < maxTrust
+        setTimeout(() => {
+            const nextTarget = characters.find(c => c.trust < c.maxTrust);
+            if (nextTarget) {
+                const nextIcon = document.querySelector(`.face-icon[data-id="${nextTarget.id}"]`);
+                selectCharacter(nextTarget, nextIcon);
+                // Post-switch message
+                setTimeout(() => {
+                    addMessage(`[안내] 섭외 성공! 다음 타겟인 ${nextTarget.name}님에게로 자동 이동되었습니다.`, 'ai', true);
+                }, 400);
+            } else {
+                // ALL CLEAR STATE
+                showMissionClear();
+            }
+        }, 600); // Faster transition (1500 -> 600)
     }
     currentTarget.currentHp = currentTarget.stats.hp;
     updateUIGauges();
@@ -534,6 +545,20 @@ function updateUIGauges() {
         const icon = document.querySelector(`.face-icon[data-id="${currentTarget.id}"]`);
         if (icon) icon.classList.add('recruited');
     }
+}
+
+function showMissionClear() {
+    addMessage(`[SYSTEM] ★ MISSION CLEAR ★ 모든 캐릭터를 섭외했습니다!`, 'ai', true);
+    const overlay = document.createElement('div');
+    overlay.className = 'mission-clear-overlay';
+    overlay.innerHTML = `
+        <div class="clear-content">
+            <h1>MISSION CLEAR</h1>
+            <p>모든 에테르가드 대원을 소집했습니다.</p>
+            <button onclick="this.parentElement.parentElement.remove()">CONTINUE</button>
+        </div>
+    `;
+    document.body.appendChild(overlay);
 }
 
 function updateComboUI() {
