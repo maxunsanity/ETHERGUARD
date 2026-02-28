@@ -17,35 +17,40 @@ const CONFIG = {
 // Character Data
 const characters = [
     {
-        id: 'yuna', name: '유나 (유비)', trait: '성실·학생회장', avatar: '🎓', bg: 'yuna_bg.png',
+        id: 'yuna', name: '유나 (유비)', trait: '성실·학생회장', avatar: '🎓',
+        bg: 'yuna_bg.png', hit_bg: 'yuna_hit.png', panic_bg: 'yuna_panic.png',
         archetype: '공감하는 리더', props: ['HEART', 'BODY'],
         stats: { atk: 320, acc: 300, crt: 150, def: 100, hp: 12000 },
         maxTrust: 36000, trust: 0, isUnlocked: true,
         greeting: '안녕하세요! 에테르가드의 유나입니다. 대화를 통해 서로를 더 알아갔으면 해요.'
     },
     {
-        id: 'kwan', name: '민주 (관우)', trait: '과묵·검도부', avatar: '🗡️', bg: 'kwan_bg.png',
+        id: 'kwan', name: '민주 (관우)', trait: '과묵·검도부', avatar: '🗡️',
+        bg: 'kwan_bg.png', hit_bg: 'kwan_hit.png', panic_bg: 'kwan_panic.png',
         archetype: '직관적인 통찰가', props: ['LOGIC', 'MYSTIC'],
         stats: { atk: 480, acc: 200, crt: 100, def: 200, hp: 12000 },
         maxTrust: 36000, trust: 0, isUnlocked: false,
         greeting: '...검의 길만큼 대화도 정직해야 하는 법. 무엇을 원하나?'
     },
     {
-        id: 'jang', name: '지희 (장비)', trait: '활발·스트릿', avatar: '🔥', bg: 'jang_bg.png',
+        id: 'jang', name: '지희 (장비)', trait: '활발·스트릿', avatar: '🔥',
+        bg: 'jang_bg.png', hit_bg: 'jang_hit.png', panic_bg: 'jang_panic.png',
         archetype: '독불장군 투사', props: ['BODY'],
         stats: { atk: 250, acc: 150, crt: 50, def: 50, hp: 12000 },
         maxTrust: 36000, trust: 0, isUnlocked: false,
         greeting: '헤이! 오늘 텐션 장난 아닌데? 나랑 한판 붙어볼래? 히히!'
     },
     {
-        id: 'sora', name: '소라 (조조)', trait: '냉철·엘리트', avatar: '🍷', bg: 'sora_bg.png',
+        id: 'sora', name: '소라 (조조)', trait: '냉철·엘리트', avatar: '🍷',
+        bg: 'sora_bg.png', hit_bg: 'sora_hit.png', panic_bg: 'sora_panic.png',
         archetype: '냉혹한 전략가', props: ['LOGIC', 'BODY'],
         stats: { atk: 420, acc: 280, crt: 250, def: 150, hp: 12000 },
         maxTrust: 36000, trust: 0, isUnlocked: false,
         greeting: '당신의 논리가 내 시간을 뺏을 만큼 가치 있기를 바랍니다.'
     },
     {
-        id: 'seola', name: '설아 (제갈량)', trait: '천재·사서', avatar: '📖', bg: 'seola_bg.png',
+        id: 'seola', name: '설아 (제갈량)', trait: '천재·사서', avatar: '📖',
+        bg: 'seola_bg.png', hit_bg: 'seola_hit.png', panic_bg: 'seola_panic.png',
         archetype: '철두철미한 분석가', props: ['LOGIC'],
         stats: { atk: 350, acc: 350, crt: 300, def: 100, hp: 12000 },
         maxTrust: 36000, trust: 0, isUnlocked: false,
@@ -398,7 +403,7 @@ function processCombatHit(res, skill) {
         }
     } else {
         // 100 Firepoints Impact Effect
-        if (selectedFpCount === 100) { // Assuming 'selectedFpCount' is the variable for firepoints
+        if (selectedFpCount === 100) {
             showImpactText(selectedFpCount);
         }
 
@@ -447,7 +452,12 @@ function processCombatHit(res, skill) {
 
     if (currentTarget.currentHp <= 0 && !isMentalBreak) {
         enterMentalBreak();
-        applyFilter('panic'); // Target turns blue/pale on mental break
+        applyFilter('panic');
+
+        // 멘탈 붕괴 이미지 적용 (존재 시)
+        if (currentTarget.panic_bg) {
+            updateCharacterImage(currentTarget.panic_bg);
+        }
     }
     shakeScreen(res.isCrit ? 15 : 5);
     updateUIGauges();
@@ -545,7 +555,11 @@ function endMentalBreak() {
         }, 600); // Faster transition (1500 -> 600)
     }
     currentTarget.currentHp = currentTarget.stats.hp;
-    document.getElementById('target-bg').classList.remove('panic'); // Remove blue tint after break ends
+    document.getElementById('target-bg').classList.remove('panic');
+
+    // 일반 상태로 복구
+    updateCharacterImage(currentTarget.bg);
+
     updateUIGauges();
 }
 
@@ -673,6 +687,15 @@ function applyFilter(type, duration = 1000) {
     const bg = document.getElementById('target-bg');
     bg.classList.add(type);
 
+    // 캐릭터 타격(Hit) 상태 이미지 전환
+    if (type === 'anger' && currentTarget.hit_bg) {
+        updateCharacterImage(currentTarget.hit_bg);
+        setTimeout(() => {
+            // Panic(붕괴) 상태가 아니라면 일반으로 복구
+            if (!isMentalBreak) updateCharacterImage(currentTarget.bg);
+        }, 2000); // 2초 유지
+    }
+
     // Also show a screen flash overlay
     const overlay = document.createElement('div');
     overlay.className = `hit-overlay ${type}-tint`;
@@ -682,6 +705,13 @@ function applyFilter(type, duration = 1000) {
         bg.classList.remove(type);
         overlay.remove();
     }, duration);
+}
+
+function updateCharacterImage(src) {
+    // Update Background (Removing IDLE animation classes)
+    const bg = document.getElementById('target-bg');
+    bg.src = src;
+    bg.className = ''; // IDLE 삭제
 }
 
 // Matrix Logic
