@@ -1,14 +1,26 @@
-/** 
- * ETHERGUARD Core Combat Engine v2.1
- * Added Support System, Representative Marker, and Detailed Combat Visuals
- */
+// Configuration constants
+const CONFIG = {
+    BASE_ACCURACY: 70,
+    COMBO_TIMEOUT: 3000,
+    COMBO_MAX: 10,
+    COMBO_CRIT_BONUS: 5, // 5% per combo
+    FEVER_TIME: 60,
+    TRUST_DECAY_INTERVAL: 360000, // 6 minutes for prototype (10pt per hour equivalent)
+    TRUST_DECAY_AMOUNT: 1,
+    RECOVERY_HP_RATIO: 0.3, // 30% HP on re-encounter
+    FP_COST_AUTOFILL: 1,
+    MIN_CHAR_LENGTH: 2,
+    MAX_CHAR_LENGTH: 100,
+    BASE_COOLDOWN: 2500
+};
 
+// Character Data
 const characters = [
     {
         id: 'yuna', name: '유나 (유비)', trait: '성실·학생회장', avatar: '🎓', bg: 'yuna_bg.png',
         archetype: '공감하는 리더', props: ['HEART', 'BODY'],
         stats: { atk: 320, acc: 300, crt: 150, def: 100, hp: 1200 },
-        maxTrust: 3600, trust: 0, isUnlocked: true, // Prototype starts with one unlocked as supporter
+        maxTrust: 3600, trust: 0, isUnlocked: true,
         greeting: '안녕하세요! 에테르가드의 유나입니다. 대화를 통해 서로를 더 알아갔으면 해요.'
     },
     {
@@ -75,6 +87,7 @@ let breakTimerFunc = null;
 document.addEventListener('DOMContentLoaded', () => {
     initUI();
     updateRepresentativeMarker();
+    updateManagerHpUI();
     startTrustDecay();
 });
 
@@ -298,13 +311,13 @@ function calculateDamage(text, skill) {
     // 1. 명중 판정
     const synergy = skill ? getSynergy(skill.id, currentTarget.props) : 1.0;
     const synergyMod = synergy > 1.0 ? 0.5 : (synergy < 1.0 ? 1.5 : 1.0);
-    const hitProb = 70 + (currentAcc * 0.1) - (currentTarget.stats.def * 0.1 * synergyMod);
+    const hitProb = CONFIG.BASE_ACCURACY + (currentAcc * 0.1) - (currentTarget.stats.def * 0.1 * synergyMod);
     const isHit = Math.random() * 100 < hitProb || (selectedFpCount === 100);
     if (!isHit) return { isHit: false };
 
     // 2. 데미지 계산
     let baseDmg = currentAtk;
-    const critProb = 5 + (currentCrt * 0.1) + (comboCount * 5);
+    const critProb = 5 + (currentCrt * 0.1) + (comboCount * CONFIG.COMBO_CRIT_BONUS);
     const isCrit = Math.random() * 100 < critProb;
     const critMultiplier = isCrit ? (selectedFpCount === 100 ? 2.0 : 1.5) : 1.0;
 
@@ -346,13 +359,23 @@ function processCombatHit(res, skill) {
 
         // 콤보 업데이트
         const now = Date.now();
-        if (now - lastHitTime < 3500) {
-            comboCount = Math.min(10, comboCount + 1);
+        if (now - lastHitTime < CONFIG.COMBO_TIMEOUT) {
+            comboCount++;
+            if (comboCount > CONFIG.COMBO_MAX) {
+                comboCount = 1; // 10 이후 초기화 (1부터 다시 시작)
+            }
         } else {
             comboCount = 1;
         }
         lastHitTime = now;
         updateComboUI();
+
+        // 10콤보 시 특수 효과 (캐릭터 떨림)
+        if (comboCount === CONFIG.COMBO_MAX) {
+            document.querySelector('.main-workspace').classList.add('combo-max-vibrate');
+        } else {
+            document.querySelector('.main-workspace').classList.remove('combo-max-vibrate');
+        }
     }
 
     if (currentTarget.currentHp <= 0 && !isMentalBreak) enterMentalBreak();
@@ -398,7 +421,7 @@ function enterMentalBreak() {
 
     const timerUI = document.getElementById('fever-timer');
     timerUI.classList.remove('hidden');
-    let timeLeft = 60;
+    let timeLeft = CONFIG.FEVER_TIME;
 
     breakTimerFunc = setInterval(() => {
         timeLeft--;
@@ -451,7 +474,7 @@ function updateComboUI() {
         else if (comboCount < 9) count.style.color = '#a855f7';
         else {
             count.style.color = '#ef4444';
-            if (comboCount === 10) triggerComboFlash();
+            if (comboCount === CONFIG.COMBO_MAX) triggerComboFlash();
         }
     }
 }
@@ -483,7 +506,7 @@ function startTrustDecay() {
     setInterval(() => {
         characters.forEach(char => {
             if (char.isUnlocked && char.trust > 0) {
-                char.trust = Math.max(0, char.trust - 1);
+                char.trust = Math.max(0, char.trust - CONFIG.TRUST_DECAY_AMOUNT);
                 if (char.trust === 0 && char !== characters[0]) { // Don't lock Yuna in prototype
                     char.isUnlocked = false;
                     document.querySelectorAll('.face-icon').forEach((el, i) => {
@@ -493,7 +516,7 @@ function startTrustDecay() {
             }
         });
         updateUIGauges();
-    }, 60000);
+    }, CONFIG.TRUST_DECAY_INTERVAL);
 }
 
 function showFloatingText(text, color) {

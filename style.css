@@ -574,8 +574,9 @@ body {
     background: rgba(56, 189, 248, 0.2);
 }
 
-/* Mental Break Vibration */
-.mental-break .character-bg-layer {
+/* Mental Break & Combo Max Vibration */
+.mental-break .character-bg-layer,
+.combo-max-vibrate .character-bg-layer {
     animation: vibrate 0.1s infinite;
     opacity: 1 !important;
 }
