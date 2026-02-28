@@ -397,19 +397,31 @@ function processCombatHit(res, skill) {
             return; // Exit early as target is switched
         }
     } else {
-        const overDmg = Math.max(0, res.dmg - currentTarget.currentHp);
-        currentTarget.currentHp = Math.max(0, currentTarget.currentHp - res.dmg);
-
-        if (overDmg > 0) {
-            currentTarget.trust = Math.min(currentTarget.maxTrust, currentTarget.trust + overDmg);
-            showFloatingText(`+${overDmg} OVERKILL`, "gold");
+        // 100 Firepoints Impact Effect
+        if (selectedFpCount === 100) { // Assuming 'selectedFpCount' is the variable for firepoints
+            showImpactText(selectedFpCount);
         }
 
-        if (res.isImmune) {
-            showFloatingText("IMMUNE!", "#94a3b8");
+        // Dynamic Typography with Direction & Filter Effects
+        if (skill) {
+            if (res.isCrit) {
+                showFloatingText(`CRITICAL! -${res.dmg}`, 'gold', 'crit');
+                applyFilter('anger');
+            } else {
+                showFloatingText(`${skill.name} -${res.dmg}`, '#38bdf8', 'skill');
+            }
         } else {
-            showFloatingText(`-${res.dmg}`, res.isCrit ? "#fbbf24" : "white");
-            if (res.isCrit) showFloatingText("CRITICAL!", "#ef4444");
+            if (res.isImmune) {
+                showFloatingText("IMMUNE!", "#94a3b8", 'chat');
+            } else {
+                showFloatingText(`-${res.dmg}`, res.isCrit ? "#fbbf24" : "white", 'chat');
+                if (res.isCrit) {
+                    showFloatingText("CRITICAL!", "#ef4444", 'chat');
+                    applyFilter('anger');
+                } else if (Math.random() < 0.2) {
+                    applyFilter('anger', 500); // Occasional anger flash for normal hits
+                }
+            }
         }
 
         // 콤보 업데이트
@@ -433,7 +445,10 @@ function processCombatHit(res, skill) {
         }
     }
 
-    if (currentTarget.currentHp <= 0 && !isMentalBreak) enterMentalBreak();
+    if (currentTarget.currentHp <= 0 && !isMentalBreak) {
+        enterMentalBreak();
+        applyFilter('panic'); // Target turns blue/pale on mental break
+    }
     shakeScreen(res.isCrit ? 15 : 5);
     updateUIGauges();
 }
@@ -530,6 +545,7 @@ function endMentalBreak() {
         }, 600); // Faster transition (1500 -> 600)
     }
     currentTarget.currentHp = currentTarget.stats.hp;
+    document.getElementById('target-bg').classList.remove('panic'); // Remove blue tint after break ends
     updateUIGauges();
 }
 
@@ -620,16 +636,91 @@ function startTrustDecay() {
     }, CONFIG.TRUST_DECAY_INTERVAL);
 }
 
-function showFloatingText(text, color) {
+function showFloatingText(text, color, animType = 'chat') {
     const fx = document.getElementById('fx-container');
     const div = document.createElement('div');
-    div.className = 'damage-text';
+    div.className = `damage-text ${animType}-anim`;
     div.textContent = text;
-    div.style.left = `${40 + Math.random() * 20}%`;
-    div.style.top = `${30 + Math.random() * 20}%`;
+
+    if (animType === 'chat') {
+        div.style.left = `${40 + Math.random() * 20}%`;
+        div.style.top = `${30 + Math.random() * 20}%`;
+    } else {
+        // Skill or Crit text usually centered vertically
+        div.style.left = `0`;
+        div.style.width = `100%`;
+        div.style.textAlign = `center`;
+        div.style.top = `40%`;
+        div.style.fontSize = `3rem`;
+    }
+
     div.style.color = color;
     fx.appendChild(div);
-    setTimeout(() => div.remove(), 800);
+
+    const duration = (animType === 'chat') ? 1000 : 2000;
+    setTimeout(() => div.remove(), duration);
+}
+
+function showImpactText(count) {
+    const div = document.createElement('div');
+    div.className = 'impact-text';
+    div.textContent = `x${count}`;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 600);
+}
+
+function applyFilter(type, duration = 1000) {
+    const bg = document.getElementById('target-bg');
+    bg.classList.add(type);
+
+    // Also show a screen flash overlay
+    const overlay = document.createElement('div');
+    overlay.className = `hit-overlay ${type}-tint`;
+    document.body.appendChild(overlay);
+
+    setTimeout(() => {
+        bg.classList.remove(type);
+        overlay.remove();
+    }, duration);
+}
+
+// Matrix Logic
+document.getElementById('matrix-btn').addEventListener('click', () => {
+    const popup = document.getElementById('matrix-popup');
+    const grid = document.getElementById('matrix-grid');
+    const weakInfo = document.getElementById('target-weakness-info');
+
+    grid.innerHTML = '';
+    Object.entries(synergyMap).forEach(([prop, data]) => {
+        const item = document.createElement('div');
+        item.className = 'matrix-item';
+        item.innerHTML = `<strong>${prop}</strong><br>
+            <span style="color:#22c55e">▶ ${data.strong}</span><br>
+            <span style="color:#ef4444">◀ ${data.weak}</span>`;
+        grid.appendChild(item);
+    });
+
+    if (currentTarget) {
+        const weaknesses = [];
+        Object.entries(synergyMap).forEach(([prop, data]) => {
+            if (currentTarget.properties.includes(data.strong)) {
+                weaknesses.push(`<span style="color:gold;font-weight:bold">${prop}</span>`);
+            }
+        });
+        weakInfo.innerHTML = `<strong>TARGET ANALYSIS:</strong><br>
+            지금 상대인 ${currentTarget.name}님은 ${weaknesses.join(', ')} 속성 키워드에 매우 취약합니다.`;
+    }
+
+    popup.classList.remove('hidden');
+});
+
+document.querySelector('.close-btn').addEventListener('click', () => {
+    document.getElementById('matrix-popup').classList.add('hidden');
+});
+
+window.onclick = (event) => {
+    const popup = document.getElementById('matrix-popup');
+    if (event.target == popup) popup.classList.add('hidden');
 }
 
 function shakeScreen(intensity) {
