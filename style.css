@@ -47,6 +47,17 @@ body {
     border: 1px solid var(--border-light);
 }
 
+.chat-container {
+    grid-area: chat;
+    height: 250px;
+    /* Reduced from 300px to ensure footer visibility */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: rgba(0, 0, 0, 0.4);
+    border-top: 1px solid var(--border-light);
+}
+
 /* Left Slider Sidebar */
 .character-slider {
     grid-area: sidebar;
