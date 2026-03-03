@@ -852,27 +852,96 @@ body {
     align-items: center;
 }
 
-.fp-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid var(--border-light);
-    color: white;
-    padding: 0.3rem 0.6rem;
-    border-radius: 0.4rem;
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.fp-btn.active {
-    background: var(--accent-gold);
-    color: black;
-    font-weight: 800;
-}
-
-.fp-label {
-    font-size: 0.8rem;
+.fp-toggle {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: var(--text-slate);
-    margin-left: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.fp-off-badge {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-slate);
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    animation: fadeIn 0.3s ease;
+}
+
+.fp-toggle.on {
+    background: linear-gradient(135deg, var(--accent-gold), #f59e0b);
+    border-color: transparent;
+    color: black;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+.fp-stepper {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 2px;
+    gap: 0.5rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.stepper-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.stepper-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.fp-input-display {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+    min-width: 40px;
+    justify-content: center;
+}
+
+#current-fp-use {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--accent-gold);
+}
+
+.fp-unit {
+    font-size: 0.65rem;
+    color: var(--text-slate);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 /* Keyword Tags */

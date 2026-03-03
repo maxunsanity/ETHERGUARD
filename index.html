@@ -209,11 +209,16 @@
                                 <span class="skill-count" id="item-count">10000</span>
                             </div>
                             <div class="firepoint-selector">
-                                <button class="fp-btn active" data-val="0">OFF</button>
-                                <button class="fp-btn" data-val="1">x1</button>
-                                <button class="fp-btn" data-val="10">x10</button>
-                                <button class="fp-btn" data-val="100">MAX</button>
-                                <span class="fp-label">소모량: <span id="current-fp-use">0</span></span>
+                                <button id="fp-toggle-btn" class="fp-toggle off">사용안함</button>
+                                <div id="fp-off-info" class="fp-off-badge">x0</div>
+                                <div id="fp-stepper-container" class="fp-stepper hidden">
+                                    <button id="fp-minus" class="stepper-btn">−</button>
+                                    <div class="fp-input-display">
+                                        <span id="current-fp-use">0</span>
+                                        <small class="fp-unit">개</small>
+                                    </div>
+                                    <button id="fp-plus" class="stepper-btn">+</button>
+                                </div>
                             </div>
                         </div>
                     </div>

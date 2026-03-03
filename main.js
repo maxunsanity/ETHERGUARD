@@ -482,15 +482,49 @@ function initUI() {
         slider.appendChild(icon);
     });
 
-    // FP Selectors
-    document.querySelectorAll('.fp-btn').forEach(btn => {
-        btn.onclick = () => {
-            document.querySelectorAll('.fp-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedFpCount = btn.dataset.val === '100' ? 100 : parseInt(btn.dataset.val);
-            document.getElementById('current-fp-use').textContent = selectedFpCount;
-        };
-    });
+    // FP Toggle & Stepper
+    const fpToggleBtn = document.getElementById('fp-toggle-btn');
+    const fpOffInfo = document.getElementById('fp-off-info');
+    const fpStepperContainer = document.getElementById('fp-stepper-container');
+    const fpMinus = document.getElementById('fp-minus');
+    const fpPlus = document.getElementById('fp-plus');
+    const fpDisplay = document.getElementById('current-fp-use');
+
+    let lastFpCount = 1; // Default when first switched on
+
+    fpToggleBtn.onclick = () => {
+        const isOn = fpToggleBtn.classList.toggle('on');
+        if (isOn) {
+            fpToggleBtn.textContent = '사용함';
+            fpToggleBtn.classList.remove('off');
+            fpOffInfo.classList.add('hidden');
+            fpStepperContainer.classList.remove('hidden');
+            selectedFpCount = lastFpCount;
+        } else {
+            fpToggleBtn.textContent = '사용안함';
+            fpToggleBtn.classList.add('off');
+            fpOffInfo.classList.remove('hidden');
+            fpStepperContainer.classList.add('hidden');
+            selectedFpCount = 0;
+        }
+        fpDisplay.textContent = selectedFpCount;
+    };
+
+    fpMinus.onclick = () => {
+        if (selectedFpCount > 1) {
+            selectedFpCount--;
+            lastFpCount = selectedFpCount;
+            fpDisplay.textContent = selectedFpCount;
+        }
+    };
+
+    fpPlus.onclick = () => {
+        if (selectedFpCount < 100) {
+            selectedFpCount++;
+            lastFpCount = selectedFpCount;
+            fpDisplay.textContent = selectedFpCount;
+        }
+    };
 
     document.getElementById('send-btn').onclick = handleSend;
     document.getElementById('chat-input').onkeypress = (e) => {
