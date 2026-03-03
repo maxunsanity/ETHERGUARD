@@ -25,8 +25,8 @@ const characters = [
         },
         bg: 'jang_normal.png',
         archetype: '폭주하는 무력', props: ['BODY'],
-        stats: { atk: 384, acc: 180, crt: 60, def: 60, hp: 14400 },
-        maxTrust: 43200, trust: 0, isUnlocked: true, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
+        stats: { atk: 384, acc: 180, crt: 60, def: 60, hp: 7056 },
+        maxTrust: 3780, trust: 0, isUnlocked: true, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
         attempts: 0, achievedTitle: null,
         synopsis: '빙의 직후 혼란에 빠져 에테르가드 변두리 클럽을 닥치는 대로 부수며 폭주하고 있는 상태.',
         introMonologues: [
@@ -46,8 +46,8 @@ const characters = [
         },
         bg: 'seola_bg.png',
         archetype: '철두철미한 분석가', props: ['LOGIC'],
-        stats: { atk: 448, acc: 380, crt: 320, def: 120, hp: 16800 },
-        maxTrust: 50400, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
+        stats: { atk: 448, acc: 380, crt: 320, def: 120, hp: 7762 },
+        maxTrust: 4158, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
         attempts: 0, achievedTitle: null,
         synopsis: '에테르가드의 메인 관제 시스템을 해킹해 쥐고, 디렉터의 접근을 차갑게 분석하며 시험하려 드는 해커.',
         introMonologues: [
@@ -67,8 +67,8 @@ const characters = [
         },
         bg: 'kwan_normal.png',
         archetype: '매혹적인 감각', props: ['SENSE'],
-        stats: { atk: 352, acc: 220, crt: 110, def: 220, hp: 13200 },
-        maxTrust: 39600, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
+        stats: { atk: 352, acc: 220, crt: 110, def: 220, hp: 8467 },
+        maxTrust: 4536, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
         attempts: 0, achievedTitle: null,
         synopsis: '가장 화려한 루미나 플라자 VIP 라운지에서 대중의 시선을 사로잡으며 자신만의 세력을 구축 중인 인플루언서.',
         introMonologues: [
@@ -88,8 +88,8 @@ const characters = [
         },
         bg: 'yuna_normal.png',
         archetype: '공감하는 리더', props: ['HEART'],
-        stats: { atk: 320, acc: 300, crt: 150, def: 100, hp: 12000 },
-        maxTrust: 36000, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
+        stats: { atk: 320, acc: 300, crt: 150, def: 100, hp: 9173 },
+        maxTrust: 4914, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
         attempts: 0, achievedTitle: null,
         synopsis: '도시의 억압받는 자들을 모아 언더그라운드 빈민가에서 거대한 저항의 불씨를 지피고 있는 이상주의 리더.',
         introMonologues: [
@@ -109,8 +109,8 @@ const characters = [
         },
         bg: 'sora_normal.png',
         archetype: '냉혹한 전략가', props: ['MYSTIC', 'LOGIC'],
-        stats: { atk: 416, acc: 300, crt: 260, def: 180, hp: 15600 },
-        maxTrust: 46800, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
+        stats: { atk: 416, acc: 300, crt: 260, def: 180, hp: 9878 },
+        maxTrust: 5292, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
         attempts: 0, achievedTitle: null,
         synopsis: '코어 타워 최상층. 도시의 통제권을 완전히 장악하기 직전, 당신을 불러들여 최후의 독대를 요청하는 지배자.',
         introMonologues: [
@@ -151,7 +151,7 @@ const quests = {
     }
 };
 
-const managerBaseStats = { atk: 400, acc: 200, crt: 100, def: 300, hp: 10000, maxHp: 10000 };
+const managerBaseStats = { atk: 400, acc: 200, crt: 100, def: 300, hp: 13000, maxHp: 13000 };
 let activeSupporter = characters[0]; // Start with the first character in sequence (Yeopo)
 
 const skills = [
@@ -174,15 +174,39 @@ const synergyMap = {
 let currentTarget = null;
 let currentStageIndex = 0; // 0-4
 let viewedStageIndex = 0; // Tracks which character is currently viewed in the lobby
-let currentManagerHp = 10000;
-let inventoryFirePoints = 10000;
+let currentManagerHp = 13000;
+let inventoryFirePoints = 99999;
 let selectedFpCount = 0; // 기본값: 사용안함(OFF)
+
+// 신규: 다음 미섭외 스테이지 인덱스 찾기 함수
+function updateCurrentStageIndex() {
+    let nextIdx = characters.findIndex(c => !c.isRecruited);
+    if (nextIdx === -1) {
+        currentStageIndex = characters.length; // 모든 스테이지 클리어
+    } else {
+        currentStageIndex = nextIdx;
+        // 현재 스테이지와 그 이전의 모든 스테이지는 잠금 해제 상태여야 함
+        for (let i = 0; i <= currentStageIndex; i++) {
+            if (characters[i]) characters[i].isUnlocked = true;
+        }
+    }
+}
 
 let comboCount = 0;
 let lastHitTime = 0;
 let repeatMap = new Map();
 let isMentalBreak = false;
 let breakTimerFunc = null;
+
+// 춴팅 메시지만 지우기 (로비 DOM 보존)
+function clearChatMessages() {
+    const container = document.getElementById('chat-messages');
+    const lobby = document.getElementById('lobby-target-workspace');
+    // lobby 제외한 자식네드만 제거
+    Array.from(container.children).forEach(el => {
+        if (el.id !== 'lobby-target-workspace') el.remove();
+    });
+}
 
 function renderGauntlet() {
     const mapContainer = document.getElementById('gauntlet-map');
@@ -233,14 +257,78 @@ function renderGauntlet() {
     }
 }
 
+// 가운틀렛에서 스테이지 선택 시 미션 브리핑 표시 후 전투 진입
+let pendingBriefingChar = null;
+
 function selectStage(index) {
+    const char = characters[index];
+    if (!char || char.isRecruited) return;
+
+    // 가운틀렛 닫기
     document.body.classList.remove('show-gauntlet');
     viewedStageIndex = index;
-    updateLobbyStageInfo();
-}
-function initCombat(char) {
+
+    // 캐릭터 기본 셋업 (UI 준비)
+    currentTarget = char;
+    char.currentHp = char.stats.hp;
+
+    // 매니저 스탯 초기화
+    managerBaseStats.atk = 400;
+    managerBaseStats.acc = 200;
+    managerBaseStats.crt = 100;
+    managerBaseStats.def = 300;
+    managerBaseStats.hp = 13000;
+    managerBaseStats.maxHp = 13000;
+
+    // 비순차 패널티 적용
+    if (index !== currentStageIndex) {
+        managerBaseStats.atk *= 0.5;
+        managerBaseStats.acc *= 0.5;
+        managerBaseStats.crt *= 0.5;
+        managerBaseStats.def *= 0.5;
+        managerBaseStats.hp *= 0.5;
+    }
+    currentManagerHp = managerBaseStats.hp;
+    updateManagerHpUI();
+
+    // 아이콘 active 표시
+    document.querySelectorAll('.face-icon').forEach(el => el.classList.remove('active'));
     const icon = document.querySelector(`.face-icon[data-id="${char.id}"]`);
-    selectCharacter(char, icon);
+    if (icon) icon.classList.add('active');
+
+    // 전투 상태 초기화
+    isMentalBreak = false;
+    comboCount = 0;
+    turnCount = 0;
+    qteCeilingCounter = 0;
+    isQTEActive = false;
+    repeatMap.clear();
+
+    // UI 업데이트
+    document.getElementById('target-name').textContent = char.name;
+    document.getElementById('target-trait').textContent = char.trait;
+    updateCharacterImage();
+    updateUIGauges();
+
+    // 채팅 초기화 (lobby-target-workspace DOM 보존)
+    clearChatMessages();
+    const lobbyWs = document.getElementById('lobby-target-workspace');
+    if (lobbyWs) lobbyWs.classList.add('hidden');
+
+    // Combat UI 표시, Trust UI 숨기기
+    document.getElementById('phase-combat-ui').classList.remove('hidden');
+    document.getElementById('phase-trust-ui').classList.add('hidden');
+    document.getElementById('chat-input').disabled = true;
+    document.getElementById('send-btn').disabled = true;
+
+    // 미션 브리핑 오버레이 표시
+    pendingBriefingChar = char;
+    showQuestOverlay(char);
+}
+
+function initCombat(char) {
+    const index = characters.indexOf(char);
+    selectStage(index);
 }
 
 // QTE State
@@ -519,8 +607,9 @@ document.addEventListener('DOMContentLoaded', () => {
     updateLobbyStageInfo();
 });
 
-function initUI() {
+function refreshSlider() {
     const slider = document.getElementById('face-icons');
+    slider.innerHTML = '';
     characters.forEach(char => {
         const icon = document.createElement('div');
         icon.className = 'face-icon';
@@ -538,13 +627,26 @@ function initUI() {
         icon.onclick = (e) => {
             if (e.ctrlKey || e.metaKey) {
                 setRepresentative(char); // Ctrl+Click to set as supporter
+            } else if (currentTarget) {
+                // 설전 진행 중 캐릭터 아이콘 클릭
+                const targetIdx = characters.indexOf(char);
+                if (char.isRecruited || targetIdx === currentStageIndex) {
+                    // 섭외 성공했거나 다음 순번인 캐릭터: 바로 전환
+                    selectCharacter(char, icon);
+                } else {
+                    // 미섭외 캐릭터: 경고 모달 표시
+                    showUnrecruitedWarning(char, icon);
+                }
             } else {
                 selectCharacter(char, icon);
             }
         };
         slider.appendChild(icon);
     });
+}
 
+function initUI() {
+    refreshSlider();
     // FP Toggle & Stepper
     const fpToggleBtn = document.getElementById('fp-toggle-btn');
     const fpOffInfo = document.getElementById('fp-off-info');
@@ -646,14 +748,15 @@ function initUI() {
 
     refreshTags();
 
-    // Quest Overlay Handler
+    // Quest Overlay Handler - START MISSION 버튼: 미션 브리핑 닫고 전투 시작
     const questStartBtn = document.getElementById('quest-start-btn');
     if (questStartBtn) {
         questStartBtn.onclick = () => {
             document.getElementById('quest-overlay').classList.add('hidden');
-            // Re-enable chat after briefcase is read
-            document.getElementById('chat-input').disabled = false;
-            document.getElementById('send-btn').disabled = false;
+            // currentTarget이 설정되어 있으면 채팅 전투 시작
+            if (currentTarget && !currentTarget.isRecruited) {
+                startCharacterChat(currentTarget);
+            }
         };
     }
 }
@@ -855,8 +958,8 @@ function selectCharacter(char, icon) {
     managerBaseStats.acc = 200;
     managerBaseStats.crt = 100;
     managerBaseStats.def = 300;
-    managerBaseStats.hp = 10000;
-    managerBaseStats.maxHp = 10000;
+    managerBaseStats.hp = 13000;
+    managerBaseStats.maxHp = 13000;
 
     // Apply Out-of-Order Penalty
     const targetIdx = characters.indexOf(char);
@@ -900,8 +1003,8 @@ function selectCharacter(char, icon) {
 
     document.getElementById('chat-messages').innerHTML = '';
 
-    // Phase 1: 시놉시스 모달창 출력 확인
-    if (!char.isRecruited && !char.hasSeenSynopsis) {
+    // Phase 1: 시놉시스 모달창 - 섭외되지 않은 캐릭터는 항상 표시
+    if (!char.isRecruited) {
         // 채팅창 비활성화
         document.getElementById('chat-input').disabled = true;
         document.getElementById('send-btn').disabled = true;
@@ -916,7 +1019,8 @@ function selectCharacter(char, icon) {
         btnStart.onclick = () => {
             char.hasSeenSynopsis = true;
             document.getElementById('synopsis-modal').classList.add('hidden');
-            startCharacterChat(char);
+            // 미션 브리핑 표시 (quest-start-btn에서 startCharacterChat 호출됨)
+            showQuestOverlay(char);
         };
     } else {
         startCharacterChat(char);
@@ -949,8 +1053,9 @@ function startCharacterChat(char) {
         trustUI.classList.add('hidden');
         document.getElementById('target-vs-name').textContent = char.name.split(' (')[0];
 
-        // Phase 11.2: Show Mission Briefing
-        showQuestOverlay(char);
+        // 채팅 활성화
+        document.getElementById('chat-input').disabled = false;
+        document.getElementById('send-btn').disabled = false;
     }
 
     // Feature 3 & 6: Different greetings based on recruitment state
@@ -1089,7 +1194,8 @@ async function executeCombatLoop(text) {
     dummy.remove();
 
     // B. 데미지 계산 및 전투 공식 적용 (선택된 effectSkill 사용)
-    const result = calculateDamage(text, effectSkill);
+    const result = calculateDamage(text, effectSkill, isDirectSkillClick);
+    isDirectSkillClick = false; // 플래그 초기화
 
     if (result.isHit) {
         processCombatHit(result, effectSkill);
@@ -1124,7 +1230,7 @@ async function executeCombatLoop(text) {
     }
 }
 
-function calculateDamage(text, skill) {
+function calculateDamage(text, skill, directSkillClick = false) {
     // Current Stats (Base + Supporter Buff)
     const currentAtk = managerBaseStats.atk + (activeSupporter ? activeSupporter.stats.atk * 0.2 : 0);
     const currentAcc = managerBaseStats.acc + (activeSupporter ? activeSupporter.stats.acc * 0.2 : 0);
@@ -1141,7 +1247,17 @@ function calculateDamage(text, skill) {
     if (!isHit) return { isHit: false };
 
     // 2. 데미지 계산
-    let baseDmg = currentAtk;
+    // 스킬 직접 클릭: 스킬 공격력만 (일반 공격력 제외)
+    // 채팅 + 스킬: 일반 공격력 + 스킬 공격력 합산
+    let baseDmg;
+    if (directSkillClick && skill) {
+        // 스킬 슬롯 직접 클릭 → 스킬 데미지만
+        baseDmg = currentAtk * (skillBonus - 1.0); // 스킬 배율 부분만 적용 (0.5x)
+        if (baseDmg < 1) baseDmg = Math.floor(currentAtk * 0.5);
+    } else {
+        // 채팅 입력 (+ 스킬 매칭 시 합산)
+        baseDmg = currentAtk; // 일반 공격력이 기본
+    }
     const critProb = 5 + (currentCrt * 0.1) + (comboCount * CONFIG.COMBO_CRIT_BONUS);
     const isCrit = Math.random() * 100 < critProb;
     const critMultiplier = isCrit ? (selectedFpCount === 100 ? 2.0 : 1.5) : 1.0;
@@ -1332,10 +1448,17 @@ function endMentalBreak() {
         currentTarget.isUnlocked = true;
         currentTarget.isRecruited = true;
 
-        // Advance Stage
-        if (currentStageIndex < characters.length - 1) {
-            currentStageIndex++;
-        }
+        // Feature 4 추가: 섭외 성공 시 디렉터 멘탈 100% 회복
+        currentManagerHp = managerBaseStats.maxHp;
+        updateManagerHpUI();
+        showFloatingText('MENTAL RECOVERED!!', '#22c55e');
+
+        // Advance Stage and Unlock Next (미섭외 캐릭터를 찾아 건너뜀)
+        updateCurrentStageIndex();
+
+        // 즉시 UI 갱신 (슬라이더 및 맵)
+        refreshSlider();
+        renderGauntlet();
 
         // Phase 11.2: Award Title based on attempts
         const q = quests[currentTarget.id];
@@ -1431,41 +1554,44 @@ function endMentalBreak() {
             delay += 2800; // 각 대사마다 2.8초 간격
         });
 
-        // 모든 대사 완료 후 다음 캐릭터로 이동 (총 ~10~12초)
+        // 모든 대사 완료 후 가운틀렛(스테이지 선택) 화면으로 이동
         const totalOutroTime = delay + 1000;
+        const outroCharId = currentTarget.id;
+
         setTimeout(() => {
-            if (currentStageIndex < characters.length && !characters[currentStageIndex].isRecruited) {
-                // Recover 50% HP for next stage
-                managerBaseStats.hp = Math.min(managerBaseStats.maxHp, managerBaseStats.hp + managerBaseStats.maxHp * 0.5);
-                currentManagerHp = managerBaseStats.hp;
-                updateManagerHpUI();
+            if (currentTarget && currentTarget.id !== outroCharId) return;
 
-                addMessage(`[안내] 섭외 성공! 다음 스테이지 ${characters[currentStageIndex].name}님에게로 이동합니다.`, 'ai', true);
+            currentTarget = null;
+            pendingBriefingChar = null;
 
-                // Show mission briefing for next stage automatically
-                setTimeout(() => initCombat(characters[currentStageIndex]), 1500);
-            } else {
-                addMessage(`[SYSTEM] ★ MISSION CLEAR ★ 모든 스테이지를 돌파했습니다!`, 'ai', true);
-                document.body.classList.add('show-gauntlet');
-                renderGauntlet();
-            }
+            document.getElementById('phase-combat-ui').classList.add('hidden');
+            document.getElementById('phase-trust-ui').classList.add('hidden');
+            document.getElementById('quest-overlay').classList.add('hidden');
+            document.querySelectorAll('.face-icon').forEach(el => el.classList.remove('active'));
+
+            clearChatMessages();
+            updateCurrentStageIndex();
+            refreshSlider();
+
+            characters.forEach(ch => { ch.trust = Math.floor(ch.trust / 2); });
+
+            renderGauntlet();
+            document.body.classList.add('show-gauntlet');
         }, totalOutroTime);
     } else {
-        // Feature 6: 섭외 실패 표시
+        // 섭외 실패
         currentTarget.hasFailedBefore = true;
-        // Phase 11.2: Increment attempts on failure
         currentTarget.attempts++;
     }
 
-    // Reset UI to Phase 1 (Combat) if not recruited, or keep Trust UI if recruited
-    if (!currentTarget.isRecruited) {
+    // 섭외 실패 시 전투 UI 복원
+    if (currentTarget && !currentTarget.isRecruited) {
         document.getElementById('phase-combat-ui').classList.remove('hidden');
         document.getElementById('phase-trust-ui').classList.add('hidden');
+        updateCharacterImage();
+        currentTarget.currentHp = currentTarget.stats.hp;
+        updateUIGauges();
     }
-
-    updateCharacterImage();
-    currentTarget.currentHp = currentTarget.stats.hp;
-    updateUIGauges();
 }
 
 function updateUIGauges() {
@@ -1668,11 +1794,14 @@ function startCooldownUI(skill) {
     }, 50);
 }
 
+let isDirectSkillClick = false; // 스킬 슬롯 직접 클릭 플래그
+
 function handleSkillSlotClick(skillId) {
     if (!currentTarget || isQTEActive) return;
     const skill = skills.find(s => s.id === skillId);
     if (!skill) return;
 
+    isDirectSkillClick = true; // 직접 클릭 표시
     const input = document.getElementById("chat-input");
     input.value = `#${skill.name}`;
     handleSend();
@@ -1706,4 +1835,54 @@ function triggerCharacterFlash(type) {
     void bg.offsetWidth; // Trigger reflow for animation restart
     bg.classList.add(flashClass);
     setTimeout(() => bg.classList.remove(flashClass), 500);
+}
+
+/**
+ * 미섭외 캐릭터 클릭 시 경고 모달 표시 함수
+ * - 스테이지 메시지 스타일의 경고창
+ * - 확인: 공격력 50% 패널티로 입장
+ * - 취소: 모달 닫기
+ */
+function showUnrecruitedWarning(char, icon) {
+    // 기존 경고 모달 제거
+    const existingModal = document.getElementById('unrecruited-warning-modal');
+    if (existingModal) existingModal.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'unrecruited-warning-modal';
+    modal.className = 'unrecruited-warning-overlay';
+    modal.innerHTML = `
+        <div class="unrecruited-warning-box">
+            <div class="unrecruited-warning-icon">⚠️</div>
+            <h3 class="unrecruited-warning-title">경고</h3>
+            <p class="unrecruited-warning-msg">
+                <strong>${char.name}</strong>은(는) 아직 섭외되지 않은 캐릭터입니다.<br><br>
+                미섭외 상태로 입장하면<br>
+                <span class="warning-highlight">공격력이 50% 하락</span>한 상태로 진행됩니다.<br><br>
+                그래도 입장하시겠습니까?
+            </p>
+            <div class="unrecruited-warning-buttons">
+                <button id="unrecruited-confirm-btn" class="warning-btn warning-confirm">확인</button>
+                <button id="unrecruited-cancel-btn" class="warning-btn warning-cancel">취소</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // 확인 버튼: 입장 진행
+    document.getElementById('unrecruited-confirm-btn').onclick = () => {
+        modal.remove();
+        selectCharacter(char, icon);
+    };
+
+    // 취소 버튼: 닫기
+    document.getElementById('unrecruited-cancel-btn').onclick = () => {
+        modal.remove();
+    };
+
+    // 모달 외부 클릭 시 닫기
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
 }
