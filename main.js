@@ -155,11 +155,11 @@ const managerBaseStats = { atk: 400, acc: 200, crt: 100, def: 300, hp: 10000, ma
 let activeSupporter = characters[0]; // Start with Yuna as supporter
 
 const skills = [
-    { id: 'BODY', name: '무력 시위', keywords: ['힘', '파괴', '강함', '무력', '돌직구', '호탕', '친구'] },
-    { id: 'LOGIC', name: '논파', keywords: ['논리', '분석', '증거', '명분', '이익', '수치', '사실', '팩트'] },
-    { id: 'SENSE', name: '예리한 통찰', keywords: ['감각', '직감', '꿰뚫다', '안목', '재치', '유머', '농담'] },
-    { id: 'HEART', name: '감정 동화', keywords: ['공감', '위로', '지지', '고충', '마음', '따뜻한'] },
-    { id: 'MYSTIC', name: '심연의 응시', keywords: ['운명', '인연', '비유', '수수께끼', '심연'] }
+    { id: 'BODY', name: '무력 시위', keywords: ['힘', '파괴', '강함', '무력', '돌직구', '호탕', '친구'], multiplier: 1.5, cooldown: 3000, lastUsed: 0 },
+    { id: 'LOGIC', name: '논파', keywords: ['논리', '분석', '증거', '명분', '이익', '수치', '사실', '팩트'], multiplier: 1.5, cooldown: 3000, lastUsed: 0 },
+    { id: 'SENSE', name: '예리한 통찰', keywords: ['감각', '직감', '꿰뚫다', '안목', '재치', '유머', '농담'], multiplier: 1.5, cooldown: 3000, lastUsed: 0 },
+    { id: 'HEART', name: '감정 동화', keywords: ['공감', '위로', '지지', '고충', '마음', '따뜻한'], multiplier: 1.5, cooldown: 3000, lastUsed: 0 },
+    { id: 'MYSTIC', name: '심연의 응시', keywords: ['운명', '인연', '비유', '수수께끼', '심연'], multiplier: 1.5, cooldown: 3000, lastUsed: 0 }
 ];
 
 const synergyMap = {
@@ -864,38 +864,47 @@ async function executeCombatLoop(text) {
     const dummyPool = ["...", "호오?", "냉철하군.", "계산된 말인가?", "어디 보죠."];
     dummy.textContent = dummyPool[Math.floor(Math.random() * dummyPool.length)];
 
-    // 발화점이 ON(x1, x10, x30, x50, x100) 상태면 무조건 스킬 연출 실행
+    // 발화점이 ON(x1, x10, x100) 상태면 스킬 연출 실행 또는 랜덤 스킬 발동
     const isSpecialAttack = selectedFpCount > 0;
+    let effectSkill = matchedSkill;
 
     if (isSpecialAttack) {
-        const roulette = document.getElementById('roulette-layer');
-        const rouletteItem = document.getElementById('roulette-item');
-        roulette.classList.remove('hidden');
+        // 키워드 매칭이 없으면 하단 스킬 중 하나를 랜덤하게 선택
+        if (!effectSkill) {
+            const now = Date.now();
+            const availableSkills = skills.filter(s => now - s.lastUsed >= s.cooldown);
+            // 쿨타임이 아닌 스킬이 있으면 그중에서, 없으면 전체에서 랜덤 선택
+            const pool = availableSkills.length > 0 ? availableSkills : skills;
+            effectSkill = pool[Math.floor(Math.random() * pool.length)];
+        }
 
-        let rouletteSpin = setInterval(() => {
-            rouletteItem.textContent = skills[Math.floor(Math.random() * skills.length)].name;
-        }, 80);
-
-        await new Promise(r => setTimeout(r, 1200));
-        clearInterval(rouletteSpin);
-
-        // 일치하는 키워드가 있으면 스킬명, 없으면 강화 공격 표시
-        rouletteItem.textContent = matchedSkill ? matchedSkill.name : "EMPOWERED ATTACK";
-        rouletteItem.style.color = 'var(--accent-gold)';
-
-        await new Promise(r => setTimeout(r, 400));
-        roulette.classList.add('hidden');
+        // 쿨타임 체크
+        const now = Date.now();
+        if (now - effectSkill.lastUsed < effectSkill.cooldown) {
+            // 사용자가 직접 키워드(#)로 입력한 경우에만 쿨타임 알림 표시 후 중단
+            if (matchedSkill) {
+                addMessage(`[시스템] ${effectSkill.name} 스킬이 아직 재사용 대기 중입니다.`, 'ai', true);
+                dummy.remove();
+                return;
+            }
+            // 랜덤 발동의 경우 쿨타임 중이면 연출 없이 진행
+        } else {
+            // 슬롯머신 연출 및 쿨타임 시작
+            await triggerSlotMachineEffect(effectSkill.id);
+            effectSkill.lastUsed = now;
+            startCooldownUI(effectSkill);
+        }
     } else {
         await new Promise(r => setTimeout(r, 600));
     }
 
     dummy.remove();
 
-    // B. 데미지 계산 및 전투 공식 적용
-    const result = calculateDamage(text, matchedSkill);
+    // B. 데미지 계산 및 전투 공식 적용 (선택된 effectSkill 사용)
+    const result = calculateDamage(text, effectSkill);
 
     if (result.isHit) {
-        processCombatHit(result, matchedSkill);
+        processCombatHit(result, effectSkill);
     } else {
         showFloatingText("MISS", "slate");
         comboCount = 0;
@@ -904,11 +913,9 @@ async function executeCombatLoop(text) {
 
     // C. QTE 또는 타겟 반격 (모든 연출 종료 후 실행)
     if (!isMentalBreak && currentTarget.currentHp > 0) {
-        // QTE 체크 로직 (여기서 실행되도록 이동)
         turnCount++;
         let isQteTriggered = false;
 
-        // 섭외되지 않은 대상에 대해서만 QTE 발동 (2회 이상 대화 시 40% 확률)
         if (!currentTarget.isRecruited && turnCount >= 2) {
             qteCeilingCounter++;
             if (qteCeilingCounter >= 4 || Math.random() < 0.45) {
@@ -937,6 +944,7 @@ function calculateDamage(text, skill) {
 
     // 1. 명중 판정
     const synergy = skill ? getSynergy(skill.id, currentTarget.props) : 1.0;
+    const skillBonus = skill ? skill.multiplier : 1.0; // 1.5x multiplier
     const synergyMod = synergy > 1.0 ? 0.5 : (synergy < 1.0 ? 1.5 : 1.0);
     const hitProb = CONFIG.BASE_ACCURACY + (currentAcc * 0.1) - (currentTarget.stats.def * 0.1 * synergyMod);
 
@@ -973,7 +981,7 @@ function calculateDamage(text, skill) {
     else if (count >= 3) penalty = 0;
     repeatMap.set(text, count + 1);
 
-    const finalDmg = Math.floor((baseDmg * fpMulti * critMultiplier * synergy * penalty) - currentTarget.stats.def);
+    const finalDmg = Math.floor((baseDmg * fpMulti * skillBonus * critMultiplier * synergy * penalty) - currentTarget.stats.def);
     return { isHit: true, dmg: Math.max(1, finalDmg), isCrit, isImmune: penalty < 0.2 };
 }
 
@@ -1397,7 +1405,81 @@ function triggerCriticalFlash() {
     }, 10);
 }
 
-// 신규 유틸리티 함수: 상태별 이미지 업데이트 및 전투 플래시
+async function triggerSlotMachineEffect(targetSkillId) {
+    const skillItems = document.querySelectorAll('.skill-item');
+    const totalSkills = skills.length;
+
+    // Reset highlights
+    skillItems.forEach(item => item.classList.remove('active-slot', 'slot-rolling'));
+
+    // "Rolling" animation: highlight each slot in sequence
+    let rollingDelay = 80;
+    const rollingFullCycles = 2; // Full passes through slots
+
+    for (let c = 0; c < rollingFullCycles; c++) {
+        for (let i = 0; i < totalSkills; i++) {
+            const currentItem = document.getElementById(`skill-${skills[i].id}`);
+            currentItem.classList.add('slot-rolling');
+            await new Promise(r => setTimeout(r, rollingDelay));
+            currentItem.classList.remove('slot-rolling');
+        }
+    }
+
+    // Settling on the target
+    const targetIdx = skills.findIndex(s => s.id === targetSkillId);
+    for (let i = 0; i <= targetIdx; i++) {
+        const currentItem = document.getElementById(`skill-${skills[i].id}`);
+        currentItem.classList.add('slot-rolling');
+        await new Promise(r => setTimeout(r, rollingDelay));
+        if (i < targetIdx) currentItem.classList.remove('slot-rolling');
+    }
+
+    // Final selection
+    const finalItem = document.getElementById(`skill-${targetSkillId}`);
+    finalItem.classList.remove('slot-rolling');
+    finalItem.classList.add('active-slot');
+
+    await new Promise(r => setTimeout(r, 400));
+}
+
+function startCooldownUI(skill) {
+    const slot = document.getElementById(`skill-${skill.id}`);
+    const overlay = slot.querySelector('.cooldown-overlay');
+    const duration = skill.cooldown;
+    let start = Date.now();
+
+    overlay.style.height = '100%';
+
+    const tick = setInterval(() => {
+        const elapsed = Date.now() - start;
+        const progress = Math.max(0, 100 - (elapsed / duration) * 100);
+        overlay.style.height = `${progress}%`;
+
+        if (elapsed >= duration) {
+            clearInterval(tick);
+            overlay.style.height = '0%';
+            slot.classList.remove('active-slot');
+        }
+    }, 50);
+}
+
+function handleSkillSlotClick(skillId) {
+    if (!currentTarget || isQTEActive) return;
+    const skill = skills.find(s => s.id === skillId);
+    if (!skill) return;
+
+    const input = document.getElementById("chat-input");
+    input.value = `#${skill.name}`;
+    handleSend();
+}
+
+document.querySelectorAll(".skill-item").forEach(item => {
+    const skillId = item.id.replace("skill-", "");
+    item.addEventListener("click", () => handleSkillSlotClick(skillId));
+    item.style.cursor = "pointer";
+});
+
+// 신규 유틸리티 함수: 상태별 이미지 업데이트 및 전투 플래시 (Restored)
 function updateCharacterImage() {
     if (!currentTarget) return;
     let imgPath = currentTarget.images.normal;

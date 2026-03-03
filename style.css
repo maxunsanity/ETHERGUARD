@@ -590,31 +590,90 @@ body {
 
 .skill-slots {
     display: flex;
-    gap: 1rem;
+    gap: 0.8rem;
+    flex: 1;
 }
 
 .skill-item {
-    width: 50px;
-    height: 50px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1.5px solid var(--border-light);
-    border-radius: 0.75rem;
+    width: 64px;
+    height: 64px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     position: relative;
+    overflow: hidden;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: default;
 }
 
-.skill-count {
+.skill-item.active-slot {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+    transform: scale(1.05);
+    background: rgba(251, 191, 36, 0.1);
+}
+
+.skill-icon-container {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 2px;
+}
+
+.skill-icon-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+}
+
+.cooldown-overlay {
     position: absolute;
-    bottom: -5px;
-    right: -5px;
-    background: var(--accent-pink);
-    padding: 0.1rem 0.4rem;
-    border-radius: 0.5rem;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;
+    background: rgba(15, 23, 42, 0.8);
+    transition: height 0.1s linear;
+}
+
+.skill-name {
     font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--text-slate);
+    letter-spacing: -0.5px;
+}
+
+.skill-item.active-slot .skill-name {
+    color: var(--accent-gold);
+}
+
+.firepoint-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 2rem;
+    margin-left: 1rem;
+}
+
+.firepoint-display .skill-icon {
+    font-size: 1.2rem;
+}
+
+.firepoint-display .skill-count {
+    font-size: 0.9rem;
     font-weight: 800;
+    color: #fca5a5;
+    position: static;
+    background: none;
+    padding: 0;
 }
 
 .mini-gauge {
@@ -659,30 +718,27 @@ body {
 }
 
 /* Roulette Layer */
-#roulette-layer {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 300px;
-    height: 100px;
-    background: rgba(15, 23, 42, 0.9);
-    border: 3px solid var(--accent-gold);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 1rem;
-    z-index: 100;
-    box-shadow: 0 0 30px var(--accent-gold);
-    animation: zoomIn 0.3s ease-out;
+/* Slot Machine Highlight Effect */
+@keyframes slotHighlight {
+    0% {
+        background: rgba(251, 191, 36, 0.1);
+        border-color: rgba(251, 191, 36, 0.2);
+    }
+
+    50% {
+        background: rgba(251, 191, 36, 0.3);
+        border-color: var(--accent-gold);
+        transform: scale(1.02);
+    }
+
+    100% {
+        background: rgba(251, 191, 36, 0.1);
+        border-color: rgba(251, 191, 36, 0.2);
+    }
 }
 
-.roulette-wheel {
-    color: var(--accent-gold);
-    font-size: 1.5rem;
-    font-weight: 900;
-    text-shadow: 0 0 10px gold;
-    animation: spinText 0.1s infinite;
+.slot-rolling {
+    animation: slotHighlight 0.1s infinite;
 }
 
 .hidden {

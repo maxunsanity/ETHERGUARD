@@ -158,12 +158,6 @@
                         <span class="combo-label">COMBO!</span>
                     </div>
 
-                    <!-- Skill Roulette Animation Layer -->
-                    <div id="roulette-layer" class="hidden">
-                        <div class="roulette-wheel">
-                            <div id="roulette-item">WAITING...</div>
-                        </div>
-                    </div>
                     <div class="chat-messages" id="chat-messages">
                         <div class="empty-state">좌측 슬라이드바에서 인물을 선택하세요.</div>
                     </div>
@@ -174,10 +168,45 @@
                     <div class="footer-top">
                         <div class="skill-controls">
                             <div class="skill-slots" id="skill-slots">
-                                <div class="skill-item" title="발화점">
-                                    <span class="skill-icon">🔥</span>
-                                    <span class="skill-count" id="item-count">10000</span>
+                                <div class="skill-item" id="skill-BODY" title="무력 시위 (Force)">
+                                    <div class="skill-icon-container">
+                                        <img src="skill_force.png" alt="무력" class="skill-icon-img">
+                                        <div class="cooldown-overlay"></div>
+                                    </div>
+                                    <span class="skill-name">무력 시위</span>
                                 </div>
+                                <div class="skill-item" id="skill-LOGIC" title="논파 (Refutation)">
+                                    <div class="skill-icon-container">
+                                        <img src="skill_refutation.png" alt="논파" class="skill-icon-img">
+                                        <div class="cooldown-overlay"></div>
+                                    </div>
+                                    <span class="skill-name">논파</span>
+                                </div>
+                                <div class="skill-item" id="skill-SENSE" title="예리한 통찰 (Insight)">
+                                    <div class="skill-icon-container">
+                                        <img src="skill_insight.png" alt="통찰" class="skill-icon-img">
+                                        <div class="cooldown-overlay"></div>
+                                    </div>
+                                    <span class="skill-name">통찰</span>
+                                </div>
+                                <div class="skill-item" id="skill-HEART" title="감정 동화 (Empathy)">
+                                    <div class="skill-icon-container">
+                                        <img src="skill_empathy.png" alt="동화" class="skill-icon-img">
+                                        <div class="cooldown-overlay"></div>
+                                    </div>
+                                    <span class="skill-name">동화</span>
+                                </div>
+                                <div class="skill-item" id="skill-MYSTIC" title="심연의 응시 (Abyss)">
+                                    <div class="skill-icon-container">
+                                        <img src="skill_abyss.png" alt="심연" class="skill-icon-img">
+                                        <div class="cooldown-overlay"></div>
+                                    </div>
+                                    <span class="skill-name">심연</span>
+                                </div>
+                            </div>
+                            <div class="firepoint-display">
+                                <span class="skill-icon">🔥</span>
+                                <span class="skill-count" id="item-count">10000</span>
                             </div>
                             <div class="firepoint-selector">
                                 <button class="fp-btn active" data-val="0">OFF</button>
