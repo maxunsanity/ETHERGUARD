@@ -13,7 +13,21 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="show-gauntlet">
+    <!-- Gauntlet Map Screen -->
+    <div id="gauntlet-screen" class="gauntlet-overlay">
+        <div class="gauntlet-header">
+            <h1 class="gauntlet-title">ETHEREAL GAUNTLET</h1>
+            <p class="gauntlet-subtitle">5 STAGES TO RECLAIM THE CITY</p>
+        </div>
+        <div id="gauntlet-map" class="gauntlet-map">
+            <!-- Stage nodes will be injected here -->
+        </div>
+        <div class="gauntlet-footer">
+            <button id="close-gauntlet" class="gauntlet-close-btn hidden">BACK TO BATTLE</button>
+        </div>
+    </div>
+
     <!-- Screen Overlay for Low HP Vignette -->
     <div id="vignette" class="vignette-overlay"></div>
 
@@ -159,7 +173,11 @@
                     </div>
 
                     <div class="chat-messages" id="chat-messages">
-                        <div class="empty-state">좌측 슬라이드바에서 인물을 선택하세요.</div>
+                        <div id="lobby-target-workspace" class="lobby-workspace">
+                            <div id="lobby-stage-display" class="lobby-stage-card glass">
+                                <!-- Injected via JS -->
+                            </div>
+                        </div>
                     </div>
                 </div>
 

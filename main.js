@@ -17,91 +17,28 @@ const CONFIG = {
 // Character Data
 const characters = [
     {
-        id: 'yuna', name: '유나 (유비)', trait: '성실·학생회장', avatar: '🎓',
-        images: {
-            normal: 'yuna_normal.png',
-            break: 'yuna_break.png',
-            recruited: 'yuna_recruited.png'
-        },
-        bg: 'yuna_normal.png',
-        archetype: '공감하는 리더', props: ['HEART', 'BODY'],
-        stats: { atk: 320, acc: 300, crt: 150, def: 100, hp: 12000 },
-        maxTrust: 36000, trust: 0, isUnlocked: true, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
-        attempts: 0, achievedTitle: null,
-        synopsis: '평범하고 성실한 학생회장이었으나, 어느 날부터 길 잃은 약자들을 모두 구원해야 한다는 맹목적인 대의(유비의 이상)에 사로잡혀 극심한 책임감과 피로에 짓눌려 있습니다.',
-        introMonologues: [
-            "모두를 이끌어야 한다는 목소리가 머릿속에서 울려퍼져요...",
-            "이 도시(에테르가드)의 지독한 어둠...",
-            "흑, 제가 그 모든 것들을 안아낼 수 있을까요?"
-        ],
-        recruitedGreeting: '디렉터님과 함께라면 무너지지 않을 수 있어요. 이 에테르가드를 과거의 한족(漢族)이 꿈꿨던 것처럼 따뜻한 내 나라로 만들어 곁에서 돕겠습니다.',
-        failedGreeting: '또 오셨군요... 이번에는 좀 더 진심을 보여주실 건가요?'
-    },
-    {
-        id: 'kwan', name: '민주 (관우)', trait: '과묵·검도부', avatar: '🗡️',
-        images: {
-            normal: 'kwan_normal.png',
-            break: 'kwan_break.png',
-            recruited: 'kwan_recruited.png'
-        },
-        bg: 'kwan_normal.png',
-        archetype: '직관적인 통찰가', props: ['LOGIC', 'MYSTIC'],
-        stats: { atk: 352, acc: 220, crt: 110, def: 220, hp: 13200 },
-        maxTrust: 39600, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
-        attempts: 0, achievedTitle: null,
-        synopsis: '과묵한 검도부원이었으나, 누군가를 위해 자신의 목을 바칠 만큼의 맹목적인 신의와 죽음에 대한 환영(관우의 최후)에 시달려 타인에게 곁을 주지 않고 날을 세우고 있습니다.',
-        introMonologues: [
-            "...다가오지 마라.",
-            "이 시대의 얄팍한 배신에...",
-            "내 푸른 언월도가 더는 피를 묻히고 싶지 않다."
-        ],
-        recruitedGreeting: '당신의 눈빛에서 지난날의 주군이 겹쳐 보였네. 에테르가드의 전장은 이제 내 검이 베어낼 테니, 디렉터는 앞만 보고 나아가시오.',
-        failedGreeting: '또 왔는가... 진심이 아닌 말에는 검으로 답하겠다.'
-    },
-    {
-        id: 'jang', name: '지희 (장비)', trait: '활발·스트릿', avatar: '🔥',
+        id: 'jang', name: '여포', trait: '폭군·광기', avatar: '🔥',
         images: {
             normal: 'jang_normal.png',
             break: 'jang_break.png',
             recruited: 'jang_recruited.png'
         },
         bg: 'jang_normal.png',
-        archetype: '독불장군 투사', props: ['BODY'],
+        archetype: '폭주하는 무력', props: ['BODY'],
         stats: { atk: 384, acc: 180, crt: 60, def: 60, hp: 14400 },
-        maxTrust: 43200, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
+        maxTrust: 43200, trust: 0, isUnlocked: true, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
         attempts: 0, achievedTitle: null,
-        synopsis: '피가 끊고 활발한 스트릿 댄서였으나, 과거 배신당해 죽음을 맞이한 기억과 주체할 수 없는 분노, 그리고 형을 잃은 슬픔이 엉켜 걸핏하면 주먹부터 나가는 트러블 메이커가 되었습니다.',
+        synopsis: '빙의 직후 혼란에 빠져 에테르가드 변두리 클럽을 닥치는 대로 부수며 폭주하고 있는 상태.',
         introMonologues: [
-            "아 젠장, 다 때려부수고 싶어!!",
-            "뭐? 매니저?",
-            "시끄럽고, 내 주먹부터 피해보라고!"
+            "으오오옷! 이 몸의 힘을 감당할 수 있겠느냐!!",
+            "다 부숴버리겠다! 날 막아서는 것들은 전부!!",
+            "매니저? 디렉터? 그딴 게 내 분노를 잠재울 수 있을까!"
         ],
-        recruitedGreeting: '히히, 보스 꽤 맘에 드는데? 앞으로 내 등은 보스가 지켜! 네 길을 막는 놈들은 장팔사모 대신 내 맨주먹으로 다 날려줄 테니까!',
-        failedGreeting: '뭐야 또 왔어? 지난번엔 좀 실망이었는데... 이번엔 제대로 해봐!'
+        recruitedGreeting: '흐흥, 제법이군. 이 여포의 무력을 감당할 수 있는 자는 네놈이 처음이다. 에테르가드의 최전선은 내가 책임지지!',
+        failedGreeting: '고작 그 정도냐? 실망이군. 더 강한 진심을 가져와라!'
     },
     {
-        id: 'sora', name: '소라 (조조)', trait: '냉철·엘리트', avatar: '🍷',
-        images: {
-            normal: 'sora_normal.png',
-            break: 'sora_break.png',
-            recruited: 'sora_recruited.png'
-        },
-        bg: 'sora_normal.png',
-        archetype: '냉혹한 전략가', props: ['LOGIC', 'BODY'],
-        stats: { atk: 416, acc: 300, crt: 260, def: 180, hp: 15600 },
-        maxTrust: 46800, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
-        attempts: 0, achievedTitle: null,
-        synopsis: '완벽을 추구하는 엘리트. 그러나 최근 내면에서 끓어오르는 압도적인 지배욕과, 세상이 자신을 버리기 전에 먼저 천하를 쥐어야 한다는 편집증(조조의 야망) 때문에 위태로운 행보를 걷고 있습니다.',
-        introMonologues: [
-            "이 도시의 시스템은 어설프기 짝이 없군요.",
-            "힘 없는 자가 지배하는 세상은 제가 허락하지 않습니다.",
-            "당신의 자격부터 묻죠."
-        ],
-        recruitedGreeting: '후후, 제 오만한 야망마저 품어내는 그릇이라... 좋습니다. 당신의 패업(覇業)을 위해, 제 냉혹한 두뇌를 에테르가드의 가장 날카로운 검으로 바치죠.',
-        failedGreeting: '또 찾아왔군요. 지난번 논리는 매우 실망스러웠는데, 발전이 있기를.'
-    },
-    {
-        id: 'seola', name: '설아 (제갈량)', trait: '천재·사서', avatar: '📖',
+        id: 'seola', name: '제갈량', trait: '천재·해커', avatar: '📖',
         images: {
             normal: 'seola_normal.png',
             break: 'seola_break.png',
@@ -112,47 +49,110 @@ const characters = [
         stats: { atk: 448, acc: 380, crt: 320, def: 120, hp: 16800 },
         maxTrust: 50400, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
         attempts: 0, achievedTitle: null,
-        synopsis: '천재적인 도서관의 사서. 하지만 오장원에서 스러져간 미완의 꿈, 완벽한 계책을 짜고도 천명을 이기지 못한 무력감에 휩싸여 끝없는 시뮬레이션 속으로 도피 중입니다.',
+        synopsis: '에테르가드의 메인 관제 시스템을 해킹해 쥐고, 디렉터의 접근을 차갑게 분석하며 시험하려 드는 해커.',
         introMonologues: [
-            "결국 모든 수창은 변수에 무너지기 마련입니다.",
-            "당신의 어설픈 설득 확률도...",
-            "제 계산에선 이미 0에 수렴하고 있어요."
+            "에테르가드의 시스템은 이미 제 손안에 있습니다.",
+            "당신의 접근 권한... 제가 허락할 것 같습니까?",
+            "제 시뮬레이션에 의하면 당신의 성공 확률은 0.01%입니다."
         ],
-        recruitedGreeting: '천명조차 비틀어버리는 당신의 불확실성에... 제 남은 생을 걸어보고 싶어졌습니다. 에테르가드의 새로운 진법은 제가 설계하겠습니다.',
-        failedGreeting: '다시 오셨군요... 지난번 대화의 논리적 허점은 개선되었나요?'
+        recruitedGreeting: '천명조차 비틀어버리는 당신의 불확실성에... 제 모든 계책을 걸어보고 싶어졌습니다. 에테르가드의 시스템을 제가 재설계하죠.',
+        failedGreeting: '역시 계산대로군요. 논리적인 허점부터 메우고 오시길.'
+    },
+    {
+        id: 'kwan', name: '초선', trait: '무희·인플루언서', avatar: '💃',
+        images: {
+            normal: 'kwan_normal.png',
+            break: 'kwan_break.png',
+            recruited: 'kwan_recruited.png'
+        },
+        bg: 'kwan_normal.png',
+        archetype: '매혹적인 감각', props: ['SENSE'],
+        stats: { atk: 352, acc: 220, crt: 110, def: 220, hp: 13200 },
+        maxTrust: 39600, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
+        attempts: 0, achievedTitle: null,
+        synopsis: '가장 화려한 루미나 플라자 VIP 라운지에서 대중의 시선을 사로잡으며 자신만의 세력을 구축 중인 인플루언서.',
+        introMonologues: [
+            "어머, 이 화려한 조명보다 눈부신 제안이 있나요?",
+            "사람들의 시선은 언제나 저를 향하죠. 당신도 예외는 아닐 텐데?",
+            "지루한 이야기는 딱 질색이에요. 절 웃겨보시겠어요?"
+        ],
+        recruitedGreeting: '호호, 당신 제법 센스 있네요? 에테르가드의 가장 화려한 꽃이 되어드리죠. 전 세계의 이목을 끌어당길 준비 되셨나요?',
+        failedGreeting: '너무 뻔한 대화네요. 감각 없는 사람은 제 곁에 둘 수 없답니다.'
+    },
+    {
+        id: 'yuna', name: '유비', trait: '군주·이상주의', avatar: '🎓',
+        images: {
+            normal: 'yuna_normal.png',
+            break: 'yuna_break.png',
+            recruited: 'yuna_recruited.png'
+        },
+        bg: 'yuna_normal.png',
+        archetype: '공감하는 리더', props: ['HEART'],
+        stats: { atk: 320, acc: 300, crt: 150, def: 100, hp: 12000 },
+        maxTrust: 36000, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
+        attempts: 0, achievedTitle: null,
+        synopsis: '도시의 억압받는 자들을 모아 언더그라운드 빈민가에서 거대한 저항의 불씨를 지피고 있는 이상주의 리더.',
+        introMonologues: [
+            "약자들의 눈물이 멈추지 않는 이 비극을 두고 볼 수 없습니다.",
+            "진정한 낙원은 지배가 아닌 헌신으로 만들어지는 것입니다.",
+            "당신도 결국 기득권의 앞잡이인가요? 아니면..."
+        ],
+        recruitedGreeting: '당신의 진심에서 제가 꿈꾸던 세상을 보았습니다. 에테르가드를 모두가 웃을 수 있는 따뜻한 보금자리로 함께 만들어가요.',
+        failedGreeting: '아직은 당신을 온전히 믿기 어렵군요. 더 깊은 진심을 보여주세요.'
+    },
+    {
+        id: 'sora', name: '조조', trait: '패왕·지배자', avatar: '🍷',
+        images: {
+            normal: 'sora_normal.png',
+            break: 'sora_break.png',
+            recruited: 'sora_recruited.png'
+        },
+        bg: 'sora_normal.png',
+        archetype: '냉혹한 전략가', props: ['MYSTIC', 'LOGIC'],
+        stats: { atk: 416, acc: 300, crt: 260, def: 180, hp: 15600 },
+        maxTrust: 46800, trust: 0, isUnlocked: false, isRecruited: false, hasFailedBefore: false, hasSeenSynopsis: false,
+        attempts: 0, achievedTitle: null,
+        synopsis: '코어 타워 최상층. 도시의 통제권을 완전히 장악하기 직전, 당신을 불러들여 최후의 독대를 요청하는 지배자.',
+        introMonologues: [
+            "천하를 쥐는 것은 오직 자격 있는 자뿐입니다.",
+            "에테르가드... 이곳의 진짜 주인이 누구인지 제가 정하죠.",
+            "위축되지 말고 당당히 서십시오. 패왕 앞에 서는 자의 예우입니다."
+        ],
+        recruitedGreeting: '제 압도적인 카리스마마저 당당히 마주하는 그 배짱... 좋습니다. 당신의 야망에 제 지략과 운명을 걸어보죠. 천하를 쥐실 준비가 되셨습니까?',
+        failedGreeting: '범인(凡人)의 수준이군요. 이 조조를 설득하려면 더 거시적인 안목을 가져오세요.'
     }
 ];
 
 const quests = {
-    'yuna': {
-        description: "학생회장의 무거운 책임을 덜어주고, 그녀를 에테르가드의 리더로 영입하세요.",
-        hint: "그녀의 성실함과 학생회장으로서의 무게를 공감하며, #위로나 #공감 키워드로 마음의 벽을 허무세요.",
-        titles: ["유나의 유일한 이해자", "유나의 신뢰받는 조언자", "학생회의 든든한 후원자"]
-    },
-    'kwan': {
-        description: "관우에게 적토마(현대식 스포츠카) 선물을 받도록 설득하라.",
-        hint: "무력보다는 #명분과 #신의를 강조하고, 유비(유나)와의 재회를 돕겠다는 약속으로 설득하세요.",
-        titles: ["관우의 첫사랑(?)", "관우의 신뢰받는 자", "관우의 비즈니스 파트너"]
-    },
     'jang': {
-        description: "장비의 분노를 잠재우고 그녀의 압도적인 무력을 에테르가드에 보태게 하세요.",
-        hint: "주먹보다 앞서는 #호탕함에 맞서 #공감보다는 #무력이나 #도발로 그녀의 야성을 깨우고 친구가 되세요.",
-        titles: ["장비의 의형제", "지희의 베스트 프렌드", "스트릿의 동료"]
-    },
-    'sora': {
-        description: "조조의 야망을 에테르가드의 평화로 승화시키세요.",
-        hint: "논리적 우월함을 인정하되, #지배보다는 #대의를 강조하고 #결단력 있는 모습으로 그녀의 야망을 자극하세요.",
-        titles: ["치세의 능신", "조조의 최측근 전략가", "엘리트 파트너"]
+        description: "스포츠카의 키를 걸고 여포를 진정시키고 첫 동료로 영입하라.",
+        hint: "복잡한 설명 대신 그의 힘을 절대적으로 칭찬하고 호탕하게 다가가세요.",
+        titles: ["여포의 의형제", "광기를 잠재운 자", "호탕한 디렉터"]
     },
     'seola': {
-        description: "제갈량의 완벽한 계산 속에 당신이라는 변수를 심으세요.",
-        hint: "천재적인 #논리를 무너뜨리기보다, 당신이라는 예측 불가능한 #인연과 #운명의 변수를 강조해 호기심을 유발하세요.",
-        titles: ["수어지교(수어지교)", "설아의 계산된 변수", "도서관의 방문객"]
+        description: "당신의 비즈니스 모델이 완벽한 대안임을 증명하여 제갈량을 CTO로 섭외하라.",
+        hint: "감정에 호소하지 마세요. 수치와 팩트 중심의 이익을 제시해야 합니다.",
+        titles: ["불확실성의 변수", "제갈량의 주군", "천재의 파트너"]
+    },
+    'kwan': {
+        description: "초선의 예술적 안목을 만족시키고 에테르가드 최고의 PR 모델로 섭외하라.",
+        hint: "지루한 말은 통하지 않습니다. 세련된 농담과 우아한 화법을 구사하세요.",
+        titles: ["루미나의 별", "초선의 뮤즈", "세련된 연출가"]
+    },
+    'yuna': {
+        description: "단순한 지배가 아닌, 모두를 위한 낙원을 만들겠다는 진심을 증명하여 유비를 영입하라.",
+        hint: "약자에 대한 깊은 공감과 헌신을 약속하여 그녀의 굳건한 경계를 허무세요.",
+        titles: ["최고의 이상주의자", "유비의 동반자", "민중의 대변인"]
+    },
+    'sora': {
+        description: "조조의 압도적인 카리스마를 뚫고, 당신이 진정한 '디렉터'임을 선포하라.",
+        hint: "위축되지 말고 당당히 맞서세요. 논리와 거시적 운명을 동시에 논해야 합니다.",
+        titles: ["에테르가드의 지배자", "조조가 인정한 영웅", "패업의 동반자"]
     }
 };
 
 const managerBaseStats = { atk: 400, acc: 200, crt: 100, def: 300, hp: 10000, maxHp: 10000 };
-let activeSupporter = characters[0]; // Start with Yuna as supporter
+let activeSupporter = characters[0]; // Start with the first character in sequence (Yeopo)
 
 const skills = [
     { id: 'BODY', name: '무력 시위', keywords: ['힘', '파괴', '강함', '무력', '돌직구', '호탕', '친구'], multiplier: 1.5, cooldown: 3000, lastUsed: 0 },
@@ -172,6 +172,8 @@ const synergyMap = {
 
 // Game State
 let currentTarget = null;
+let currentStageIndex = 0; // 0-4
+let viewedStageIndex = 0; // Tracks which character is currently viewed in the lobby
 let currentManagerHp = 10000;
 let inventoryFirePoints = 10000;
 let selectedFpCount = 0; // 기본값: 사용안함(OFF)
@@ -181,6 +183,65 @@ let lastHitTime = 0;
 let repeatMap = new Map();
 let isMentalBreak = false;
 let breakTimerFunc = null;
+
+function renderGauntlet() {
+    const mapContainer = document.getElementById('gauntlet-map');
+    mapContainer.innerHTML = '';
+
+    characters.forEach((char, index) => {
+        const isCleared = char.isRecruited;
+        const isCurrent = index === currentStageIndex && !isCleared;
+        const isLocked = index > currentStageIndex;
+
+        const node = document.createElement('div');
+        node.className = `stage-node ${isCleared ? 'cleared' : ''} ${isCurrent ? 'current' : ''} ${isLocked ? 'locked' : ''}`;
+
+        let statusText = "LOCKED";
+        let statusIcon = "🔒";
+        if (isCleared) {
+            statusText = "CLEARED";
+            statusIcon = "✅";
+        } else if (isCurrent) {
+            statusText = "START";
+            statusIcon = char.avatar;
+        } else {
+            statusText = "CHALLENGE";
+            statusIcon = char.avatar; // Show avatar but node has 'locked' class (opacity/blur)
+        }
+
+        node.innerHTML = `
+            <span class="stage-number">STAGE 0${index + 1}</span>
+            <span class="stage-status-icon">${statusIcon}</span>
+            <h3 class="stage-name">${char.name}</h3>
+            <button class="stage-btn">${statusText}</button>
+        `;
+
+        // Allow clicking any non-cleared stage
+        if (!isCleared) {
+            node.querySelector('.stage-btn').onclick = () => selectStage(index);
+        }
+
+        mapContainer.appendChild(node);
+    });
+
+    // Toggle close button if at least one stage is playable/active
+    const closeBtn = document.getElementById('close-gauntlet');
+    if (currentTarget) {
+        closeBtn.classList.remove('hidden');
+    } else {
+        closeBtn.classList.add('hidden');
+    }
+}
+
+function selectStage(index) {
+    document.body.classList.remove('show-gauntlet');
+    viewedStageIndex = index;
+    updateLobbyStageInfo();
+}
+function initCombat(char) {
+    const icon = document.querySelector(`.face-icon[data-id="${char.id}"]`);
+    selectCharacter(char, icon);
+}
 
 // QTE State
 let turnCount = 0;
@@ -287,7 +348,7 @@ const qteData = {
         ],
         options: [
             { text: "#피를_나눈_형제", score: 100, msg: "크하하! 내 분노를 대신 맞겠다고? 맘에 들었어! 이제부터 넌 내 맹세 형제다!" },
-            { text: "#진정_요구", score: 50, msg: "조용히 하라고? 으씨... 알았어, 한 번 더 들어는 볼게." },
+            { text: "#진정_요구", score: 50, msg: "으씨... 알았어, 한 번 더 들어는 볼게." },
             { text: "#규칙_강요", score: -50, msg: "시끄러워!! 법이고 나발이고 내 주먹이 먼저야!!" },
             { text: "#맞대응", score: -50, msg: "어쭈, 너도 한 판 붙자 이거지?! 다 박살내주마!" },
             { text: "#위협", score: -50, msg: "날 겁주려고? 내가 누군지 똑똑히 보여주마!!" }
@@ -454,6 +515,8 @@ document.addEventListener('DOMContentLoaded', () => {
     updateRepresentativeMarker();
     updateManagerHpUI();
     startTrustDecay();
+    renderGauntlet();
+    updateLobbyStageInfo();
 });
 
 function initUI() {
@@ -568,10 +631,16 @@ function initUI() {
         if (synergyBtnVs) synergyBtnVs.onclick = openSynergy;
 
         closeSynergyBtn.onclick = () => synergyModal.classList.add('hidden');
-        synergyModal.onclick = (e) => {
-            if (e.target === synergyModal) {
-                synergyModal.classList.add('hidden');
-            }
+        window.onclick = (e) => { if (e.target === synergyModal) synergyModal.classList.add('hidden'); };
+
+        // Gauntlet Navigation
+        document.getElementById('manager-info').onclick = () => {
+            document.body.classList.add('show-gauntlet');
+            renderGauntlet();
+        };
+
+        document.getElementById('close-gauntlet').onclick = () => {
+            document.body.classList.remove('show-gauntlet');
         };
     }
 
@@ -691,7 +760,7 @@ function autoFill(tag) {
         ],
         '#질문': [
             `${currentTarget.name}님은 이 상황에서 본인의 신념과 이익 중 무엇을 선택하실 건가요?`,
-            `우리가 함께할 때 발생할 시너지가 보이지 않나요? 한번 더 깊게 생각해보시죠.`,
+            `우리가 함께할 때 발생할 시너지가 보이지 않나요? 한번 더 깊게 생각해 보시죠.`,
             `단도입입적으로 묻겠습니다. 당신이 진정으로 원하는 미래는 무엇입니까?`
         ],
         '#도발': [
@@ -718,12 +787,97 @@ function autoFill(tag) {
     showFloatingText("-1 FIREPOINT", "#38bdf8");
 }
 
+function updateLobbyStageInfo() {
+    const lobbyWorkspace = document.getElementById('lobby-target-workspace');
+    const lobbyContainer = document.getElementById('lobby-stage-display');
+    const char = characters[viewedStageIndex];
+
+    if (!char || currentTarget) {
+        lobbyWorkspace.classList.add('hidden');
+        return;
+    }
+
+    lobbyWorkspace.classList.remove('hidden');
+
+    // Penalty Check: if viewing a stage that isn't the current sequential goal
+    const isPenalized = viewedStageIndex !== currentStageIndex;
+    let penaltyHtml = '';
+    let actionButtonsHtml = `<button class="lobby-start-btn" id="lobby-start-mission-btn">START MISSION</button>`;
+
+    if (isPenalized) {
+        penaltyHtml = `
+            <div class="lobby-penalty-warning">
+                ⚠️ 이전 미션을 클리어 하지 않아서 능력의 50%가 차감되어 진행 됩니다.
+            </div>
+        `;
+        actionButtonsHtml += `
+            <button class="lobby-return-btn" id="lobby-return-current-btn">이전 미션으로 돌아가기</button>
+        `;
+    }
+
+    lobbyContainer.innerHTML = `
+        <span class="lobby-stage-num">STAGE 0${viewedStageIndex + 1}</span>
+        <span class="lobby-stage-avatar">${char.avatar}</span>
+        <h2 class="lobby-stage-name">${char.name}</h2>
+        ${penaltyHtml}
+        <p class="lobby-stage-synopsis">${char.synopsis}</p>
+        <div class="lobby-actions">
+            ${actionButtonsHtml}
+        </div>
+    `;
+
+    document.getElementById('lobby-start-mission-btn').onclick = () => {
+        const icon = document.querySelector(`.face-icon[data-id="${char.id}"]`);
+        selectCharacter(char, icon);
+    };
+
+    if (isPenalized) {
+        document.getElementById('lobby-return-current-btn').onclick = () => {
+            viewedStageIndex = currentStageIndex;
+            updateLobbyStageInfo();
+        };
+    }
+}
+
 function selectCharacter(char, icon) {
     if (currentTarget === char) return;
     document.querySelectorAll('.face-icon').forEach(el => el.classList.remove('active'));
     if (icon) icon.classList.add('active');
 
+    // Hide Lobby when character is selected
+    document.getElementById('lobby-target-workspace').classList.add('hidden');
+
     currentTarget = char;
+
+    // Reset managerBaseStats to original values before applying any new penalties
+    // This ensures that penalties from previous out-of-order encounters don't stack.
+    managerBaseStats.atk = 400;
+    managerBaseStats.acc = 200;
+    managerBaseStats.crt = 100;
+    managerBaseStats.def = 300;
+    managerBaseStats.hp = 10000;
+    managerBaseStats.maxHp = 10000;
+
+    // Apply Out-of-Order Penalty
+    const targetIdx = characters.indexOf(char);
+    if (targetIdx !== currentStageIndex) {
+        // 50% stat reduction
+        managerBaseStats.atk *= 0.5;
+        managerBaseStats.acc *= 0.5;
+        managerBaseStats.crt *= 0.5;
+        managerBaseStats.def *= 0.5;
+        // 50% HP reduction (Initial HP for this combat)
+        managerBaseStats.hp *= 0.5;
+        currentManagerHp = managerBaseStats.hp; // Set current HP based on penalized max HP
+        updateManagerHpUI();
+
+        addMessage(`[경고] 비순차적 대상 접근으로 인해 모든 능력치가 50% 차감되었습니다.`, 'ai', true);
+    } else {
+        // If it's the correct stage, ensure currentManagerHp is reset to full (unpenalized)
+        currentManagerHp = managerBaseStats.hp;
+        updateManagerHpUI();
+    }
+
     currentTarget.currentHp = char.stats.hp;
     isMentalBreak = false;
     comboCount = 0;
@@ -995,12 +1149,17 @@ function calculateDamage(text, skill) {
     const fpMods = { 1: 1.5, 10: 2.0, 30: 3.0, 50: 4.5, 100: 8.0 };
     let fpMulti = 1.0;
 
-    // 발화점 보유량 체크
+    // 발화점 보유량 체크 (스테이지 가중치 적용)
     if (selectedFpCount > 0) {
-        if (inventoryFirePoints >= selectedFpCount) {
+        const stageIdx = characters.indexOf(currentTarget);
+        const costPerUnit = (stageIdx + 1) * 10;
+        const totalCost = selectedFpCount * costPerUnit;
+
+        if (inventoryFirePoints >= totalCost) {
             fpMulti = fpMods[selectedFpCount] || 1.0;
-            inventoryFirePoints -= selectedFpCount;
+            inventoryFirePoints -= totalCost;
             document.getElementById('item-count').textContent = inventoryFirePoints;
+            showFloatingText(`-${totalCost} FIREPOINTS`, "#38bdf8");
         } else {
             // 발화점 부족 시 일반 공격으로 전환
             addMessage("[시스템] 발화점이 부족하여 일반 공격으로 진행합니다.", "ai", true);
@@ -1173,6 +1332,11 @@ function endMentalBreak() {
         currentTarget.isUnlocked = true;
         currentTarget.isRecruited = true;
 
+        // Advance Stage
+        if (currentStageIndex < characters.length - 1) {
+            currentStageIndex++;
+        }
+
         // Phase 11.2: Award Title based on attempts
         const q = quests[currentTarget.id];
         if (q) {
@@ -1213,35 +1377,35 @@ function endMentalBreak() {
 
         // 캐릭터별 마무리 대사 (이미지 전환 후 약 10초간 연출)
         const recruitedOutros = {
-            'yuna': [
-                currentTarget.recruitedGreeting,
-                "...후, 드디어 제대로 된 디렉터를 만났군요.",
-                "이제부터는 혼자가 아니에요. 같이 이 도시를 지켜요.",
-                "언제든 제게 기대세요. 저도 그럴게요, 디렉터님."
-            ],
-            'kwan': [
-                currentTarget.recruitedGreeting,
-                "...오랜만에 등을 맡길 수 있는 기분이로다.",
-                "언월도는 녹슬지 않는다. 적이 나타나면 알려라.",
-                "이 관운장, 디렉터의 뜻이 닿는 날까지 함께하리라."
-            ],
             'jang': [
                 currentTarget.recruitedGreeting,
-                "야호~!! 이제 진짜 한 팀이다!",
-                "다음엔 더 센 놈들이 와도 걱정 마! 내가 다 때려줄게.",
-                "보스, 밥은 먹었어? 싸우려면 힘 있어야 한다구!"
-            ],
-            'sora': [
-                currentTarget.recruitedGreeting,
-                "…이런 기분이 '안도감'이라는 건가요. 낯설군요.",
-                "앞으로 제 두뇌는 당신의 것입니다. 낭비하지 마세요.",
-                "실망시키면 용납하지 않을 거예요. 물론, 기대도 하고 있고요."
+                "...흥, 제법이군. 이 몸의 무력을 담기엔 이 에테르가드도 좁을지 모르지.",
+                "네놈의 배짱 하나는 인정하마. 지루하게 만들지 마라!",
+                "자, 다음 판은 어디냐? 내 분노를 쏟을 곳을 안내해라!"
             ],
             'seola': [
                 currentTarget.recruitedGreeting,
-                "...흥미롭군요. 제 시뮬레이션엔 없던 결과입니다.",
-                "함께라면 제가 넘지 못한 천명을, 이번엔 넘을 수 있을지도 모르겠어요.",
-                "앞으로 잘 부탁합니다, 디렉터님. 제 계책은 아낌없이 드리죠."
+                "...제 계산에 없던 변수가 승리를 이끌었군요.",
+                "완벽한 설계와 당신이라는 변수... 꽤 흥미로운 조합이 될 것 같습니다.",
+                "에테르가드의 코어는 이제 제 통제하에 있습니다. 안심하시길."
+            ],
+            'kwan': [
+                currentTarget.recruitedGreeting,
+                "...어머, 제 마음의 리듬을 맞춘 건 당신이 처음이에요.",
+                "에테르가드의 무대는 이미 준비되었답니다. 제 춤에 매료될 준비 되셨나요?",
+                "후후, 당신 곁에 있으면 지루할 틈이 없겠어요."
+            ],
+            'yuna': [
+                currentTarget.recruitedGreeting,
+                "...이 떨림이 '희망'인가요. 진심으로 믿어보고 싶어졌어요.",
+                "빈민가의 아이들도, 억압받는 자들도... 이제야 웃을 수 있겠군요.",
+                "낙원을 향한 여정, 끝까지 당신과 함께하겠습니다."
+            ],
+            'sora': [
+                currentTarget.recruitedGreeting,
+                "...패왕의 길을 이해하는 자를 만났군요. 만족스럽습니다.",
+                "에테르가드의 진짜 가치는 이제 제가 증명해 보이죠.",
+                "절 실망시키지 마십시오. 당신의 야망이 어디까지 닿는지 지켜보겠습니다."
             ]
         };
 
@@ -1270,13 +1434,20 @@ function endMentalBreak() {
         // 모든 대사 완료 후 다음 캐릭터로 이동 (총 ~10~12초)
         const totalOutroTime = delay + 1000;
         setTimeout(() => {
-            const nextTarget = characters.find(c => !c.isRecruited && c !== currentTarget);
-            if (nextTarget) {
-                const nextIcon = document.querySelector(`.face-icon[data-id="${nextTarget.id}"]`);
-                addMessage(`[안내] 섭외 성공! 다음 타겟 ${nextTarget.name}님에게로 이동합니다.`, 'ai', true);
-                setTimeout(() => selectCharacter(nextTarget, nextIcon), 1500);
+            if (currentStageIndex < characters.length && !characters[currentStageIndex].isRecruited) {
+                // Recover 50% HP for next stage
+                managerBaseStats.hp = Math.min(managerBaseStats.maxHp, managerBaseStats.hp + managerBaseStats.maxHp * 0.5);
+                currentManagerHp = managerBaseStats.hp;
+                updateManagerHpUI();
+
+                addMessage(`[안내] 섭외 성공! 다음 스테이지 ${characters[currentStageIndex].name}님에게로 이동합니다.`, 'ai', true);
+
+                // Show mission briefing for next stage automatically
+                setTimeout(() => initCombat(characters[currentStageIndex]), 1500);
             } else {
-                addMessage(`[SYSTEM] ★ MISSION CLEAR ★ 모든 캐릭터를 섭외했습니다!`, 'ai', true);
+                addMessage(`[SYSTEM] ★ MISSION CLEAR ★ 모든 스테이지를 돌파했습니다!`, 'ai', true);
+                document.body.classList.add('show-gauntlet');
+                renderGauntlet();
             }
         }, totalOutroTime);
     } else {
