@@ -14,6 +14,46 @@
 </head>
 
 <body>
+    <!-- Screen Overlay for Low HP Vignette -->
+    <div id="vignette" class="vignette-overlay"></div>
+
+    <!-- Quest/Mission Overlay -->
+    <div id="quest-overlay" class="quest-overlay hidden">
+        <div class="quest-content glass">
+            <div class="quest-header">
+                <span class="quest-icon">⚔️</span>
+                <h2 class="quest-title">MISSION BRIEFING</h2>
+            </div>
+            <div class="quest-body">
+                <div class="quest-section">
+                    <p class="section-label">OBJECTIVE</p>
+                    <p id="quest-desc" class="quest-desc"></p>
+                </div>
+                <div class="quest-section">
+                    <p class="section-label">TACTICAL HINT</p>
+                    <p id="quest-hint" class="quest-hint"></p>
+                </div>
+                <div class="quest-section">
+                    <p class="section-label">EARNABLE TITLES</p>
+                    <div class="reward-list">
+                        <div class="reward-item">
+                            <span class="rank gold">1st</span>
+                            <span id="title-1"></span>
+                        </div>
+                        <div class="reward-item">
+                            <span class="rank silver">2nd</span>
+                            <span id="title-2"></span>
+                        </div>
+                        <div class="reward-item">
+                            <span class="rank bronze">3rd+</span>
+                            <span id="title-3"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button id="quest-start-btn" class="quest-btn">START MISSION</button>
+        </div>
+    </div>
     <div class="app-container">
         <!-- Left Slider: Face Icons -->
         <aside class="character-slider glass">
@@ -22,7 +62,7 @@
             <!-- Manager Profile Summary -->
             <div class="manager-mini-info" id="manager-info">
                 <div class="mgr-header">
-                    <span class="lvl">LVL 99</span>
+                    <span class="lvl">LV.99</span>
                     <span class="name">DIRECTOR</span>
                 </div>
             </div>
@@ -48,22 +88,61 @@
             <div class="interface-overlay">
                 <!-- Top Header: Stats & Gauges -->
                 <header class="battle-header glass">
-                    <div class="target-profile">
-                        <div class="target-name-container">
-                            <span id="target-name">Character Name</span>
-                            <span id="target-trait" class="trait-tag">Trait</span>
-                            <div id="fever-timer" class="hidden">01:00</div>
-                        </div>
-                        <div class="gauges">
-                            <div class="gauge-group">
-                                <label>MENTAL (HP)</label>
-                                <div class="gauge-bar hp">
-                                    <div id="hp-fill"></div>
+                    <!-- Phase 1: Combat (VS) -->
+                    <div id="phase-combat-ui" class="combat-ui">
+                        <div class="vs-layout-container">
+                            <!-- Player Side -->
+                            <div class="player-side">
+                                <div class="player-name-header">DIRECTOR</div>
+                                <div class="gauge-bar hp director-hp">
+                                    <div id="player-hp-fill" class="hp-fill"></div>
                                 </div>
                             </div>
-                            <div class="gauge-group">
+
+                            <div class="vs-middle-text">VS</div>
+
+                            <!-- Target Side -->
+                            <div class="target-side">
+                                <div class="target-name-row">
+                                    <button id="btn-synergy-vs" class="synergy-btn synergy-btn-vs" title="현재 캐릭터 상성 정보">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor"
+                                            stroke-width="2" fill="none">
+                                            <polygon
+                                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                                            </polygon>
+                                        </svg>
+                                    </button>
+                                    <div id="target-vs-name" class="target-name-vs">TARGET</div>
+                                </div>
+                                <div class="gauge-bar hp enemy-hp">
+                                    <div id="hp-fill" class="hp-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 2: Recruitment (After Break or Recruited) -->
+                    <div id="phase-trust-ui" class="trust-ui hidden">
+                        <div class="target-name-row">
+                            <div id="target-achieved-title" class="target-achieved-title"></div>
+                            <span id="target-name">Character Name</span>
+                            <span id="target-trait" class="trait-tag" style="display:none">Trait</span>
+                            <button id="btn-synergy" class="synergy-btn" style="margin-left: 10px; display: none;"
+                                title="현재 캐릭터 상성 정보">
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2"
+                                    fill="none">
+                                    <polygon
+                                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                                    </polygon>
+                                </svg>
+                            </button>
+                            <div id="fever-timer" class="hidden">01:00</div>
+                            <div id="qte-timer" class="hidden">30s</div>
+                        </div>
+                        <div class="gauges centered-trust">
+                            <div class="gauge-group trust-only">
                                 <label>TRUST / AFFINITY</label>
-                                <div class="gauge-bar trust">
+                                <div class="gauge-bar trust large-trust">
                                     <div id="trust-fill"></div>
                                 </div>
                             </div>
@@ -101,16 +180,11 @@
                                 </div>
                             </div>
                             <div class="firepoint-selector">
+                                <button class="fp-btn active" data-val="0">OFF</button>
                                 <button class="fp-btn" data-val="1">x1</button>
                                 <button class="fp-btn" data-val="10">x10</button>
                                 <button class="fp-btn" data-val="100">MAX</button>
-                                <span class="fp-label">소모량: <span id="current-fp-use">1</span></span>
-                            </div>
-                        </div>
-                        <div class="user-info">
-                            <span class="label">MANAGER MENTAL</span>
-                            <div class="mini-gauge">
-                                <div id="user-hp-fill"></div>
+                                <span class="fp-label">소모량: <span id="current-fp-use">0</span></span>
                             </div>
                         </div>
                     </div>
@@ -128,10 +202,107 @@
         </div>
     </div>
 
+    <!-- QTE (Quick Time Event) Layer -->
+    <div id="qte-overlay" class="hidden">
+        <div class="qte-content">
+            <div id="qte-question" class="qte-question"></div>
+            <div id="qte-options" class="qte-options"></div>
+        </div>
+    </div>
+
     <!-- Floating Effects Container -->
     <div id="fx-container"></div>
 
-    <script src="main.js"></script>
+    <!-- Synergy Chart Modal -->
+    <div id="synergy-modal" class="modal-overlay hidden">
+        <div class="modal-content glass">
+            <button id="close-synergy-modal" class="close-btn">&times;</button>
+            <h2 class="synergy-title">💡 에고(Ego) 5방 상성표</h2>
+            <p class="synergy-desc">해당 캐릭터의 약점 속성을 찌르면 유리한 상성 효과를 얻습니다.</p>
+            <div class="synergy-chart-container">
+                <svg viewBox="0 0 500 500" class="synergy-svg">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="28" refY="3" orient="auto">
+                            <polygon points="0 0, 8 3, 0 6" fill="var(--accent-gold)" />
+                        </marker>
+                        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="3" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                    </defs>
+
+                    <!-- Connections -->
+                    <path d="M250,60 L430,190 L360,400 L140,400 L70,190 Z" fill="none" stroke="rgba(255,255,255,0.1)"
+                        stroke-width="2" />
+
+                    <line x1="250" y1="60" x2="430" y2="190" stroke="var(--accent-gold)" stroke-width="3"
+                        marker-end="url(#arrowhead)" />
+                    <line x1="430" y1="190" x2="360" y2="400" stroke="var(--accent-gold)" stroke-width="3"
+                        marker-end="url(#arrowhead)" />
+                    <line x1="360" y1="400" x2="140" y2="400" stroke="var(--accent-gold)" stroke-width="3"
+                        marker-end="url(#arrowhead)" />
+                    <line x1="140" y1="400" x2="70" y2="190" stroke="var(--accent-gold)" stroke-width="3"
+                        marker-end="url(#arrowhead)" />
+                    <line x1="70" y1="190" x2="250" y2="60" stroke="var(--accent-gold)" stroke-width="3"
+                        marker-end="url(#arrowhead)" />
+
+                    <g class="node element-body" transform="translate(250,60)">
+                        <circle r="42" fill="#1e293b" stroke="#ef4444" stroke-width="3" filter="url(#glow)" />
+                        <text y="-5" fill="white" font-weight="bold" text-anchor="middle" font-size="16">BODY</text>
+                        <text y="15" fill="#94a3b8" text-anchor="middle" font-size="12">무력</text>
+                    </g>
+                    <g class="node element-logic" transform="translate(430,190)">
+                        <circle r="42" fill="#1e293b" stroke="#3b82f6" stroke-width="3" filter="url(#glow)" />
+                        <text y="-5" fill="white" font-weight="bold" text-anchor="middle" font-size="16">LOGIC</text>
+                        <text y="15" fill="#94a3b8" text-anchor="middle" font-size="12">논파</text>
+                    </g>
+                    <g class="node element-sense" transform="translate(360,400)">
+                        <circle r="42" fill="#1e293b" stroke="#10b981" stroke-width="3" filter="url(#glow)" />
+                        <text y="-5" fill="white" font-weight="bold" text-anchor="middle" font-size="16">SENSE</text>
+                        <text y="15" fill="#94a3b8" text-anchor="middle" font-size="12">통찰</text>
+                    </g>
+                    <g class="node element-heart" transform="translate(140,400)">
+                        <circle r="42" fill="#1e293b" stroke="#ec4899" stroke-width="3" filter="url(#glow)" />
+                        <text y="-5" fill="white" font-weight="bold" text-anchor="middle" font-size="16">HEART</text>
+                        <text y="15" fill="#94a3b8" text-anchor="middle" font-size="12">공감</text>
+                    </g>
+                    <g class="node element-mystic" transform="translate(70,190)">
+                        <circle r="42" fill="#1e293b" stroke="#a855f7" stroke-width="3" filter="url(#glow)" />
+                        <text y="-5" fill="white" font-weight="bold" text-anchor="middle" font-size="16">MYSTIC</text>
+                        <text y="15" fill="#94a3b8" text-anchor="middle" font-size="12">심연</text>
+                    </g>
+                </svg>
+            </div>
+            <div class="synergy-legend">
+                <span class="legend-gold">➔</span> 공격 시 유리한 화살표 방향
+            </div>
+        </div>
+    </div>
+
+    <!-- Synopsis Modal -->
+    <div id="synopsis-modal" class="modal-overlay hidden">
+        <div class="modal-content glass synopsis-box">
+            <h2 id="synopsis-title" class="synergy-title">SYSTEM: 대상 식별</h2>
+            <div id="synopsis-text" class="synopsis-desc">
+                여기에 캐릭터의 시놉시스가 출력됩니다.
+            </div>
+            <button id="btn-start-chat" class="synergy-btn" style="margin-top: 20px; width: 100%;">대화 시작
+                (ENGAGE)</button>
+        </div>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="game-over-overlay" class="modal-overlay hidden" style="z-index: 10000; text-align: center;">
+        <div class="modal-content glass synopsis-box" style="border: 1px solid #ef4444; box-shadow: 0 0 40px rgba(239, 68, 68, 0.3);">
+            <h1 style="color: #ef4444; font-size: 2.5rem; margin-bottom: 15px; text-shadow: 0 0 15px rgba(239, 68, 68, 0.8);">MENTAL BREAKDOWN</h1>
+            <p style="color: #e2e8f0; font-size: 1.1rem; margin-bottom: 30px; line-height: 1.5;">디렉터의 멘탈이 완전히 소진되었습니다.<br>재정비 후 다시 시도해주세요.</p>
+            <button onclick="location.reload()" class="synergy-btn" style="background: rgba(239, 68, 68, 0.15); border-color: #ef4444; color: #fca5a5; width: 100%; padding: 15px; font-weight: bold; font-size: 1.1rem;">
+                다시 시작 (Restart)
+            </button>
+        </div>
+    </div>
+
+    <script src="main.js?v=2"></script>
 </body>
 
 </html>
