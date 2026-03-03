@@ -103,9 +103,9 @@ const characters = [
     {
         id: 'seola', name: '설아 (제갈량)', trait: '천재·사서', avatar: '📖',
         images: {
-            normal: 'seola_bg.png',
-            break: 'seola_bg.png',
-            recruited: 'seola_bg.png'
+            normal: 'seola_normal.png',
+            break: 'seola_break.png',
+            recruited: 'seola_recruited.png'
         },
         bg: 'seola_bg.png',
         archetype: '철두철미한 분석가', props: ['LOGIC'],
@@ -503,7 +503,31 @@ function initUI() {
     const synergyModal = document.getElementById('synergy-modal');
     const closeSynergyBtn = document.getElementById('close-synergy-modal');
 
-    const openSynergy = () => synergyModal.classList.remove('hidden');
+    const openSynergy = () => {
+        // Populate tactical info if there's a target
+        const infoBox = document.getElementById('target-synergy-info');
+        if (currentTarget && !currentTarget.isRecruited) {
+            document.getElementById('modal-target-name').textContent = currentTarget.name;
+
+            // Get weakness based on archetype/props
+            // characters object has props: ['HEART', 'BODY'] etc. Synergy Map shows weak against.
+            // But usually characters have an 'archetype speed' or 'ego speed'. 
+            // In characters data: props: ['HEART', 'BODY']
+            // Let's find what beats them.
+            const weakness = currentTarget.props ? currentTarget.props.map(p => {
+                // Find what beats this prop
+                const entry = Object.entries(synergyMap).find(([key, val]) => val.strong === p);
+                return entry ? entry[0] : null;
+            }).filter(p => p).join(', ') : "???";
+
+            document.getElementById('modal-target-weakness').textContent = weakness;
+            document.getElementById('modal-target-hint').textContent = quests[currentTarget.id]?.hint || "공략 정보가 없습니다.";
+            infoBox.classList.remove('hidden');
+        } else {
+            infoBox.classList.add('hidden');
+        }
+        synergyModal.classList.remove('hidden');
+    };
 
     if (synergyBtn && synergyModal && closeSynergyBtn) {
         synergyBtn.onclick = openSynergy;

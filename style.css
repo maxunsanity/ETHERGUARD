@@ -1097,8 +1097,8 @@ body {
     background: rgba(30, 41, 59, 0.8);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 1.5rem;
-    padding: 2.5rem;
-    max-width: 600px;
+    padding: 1.5rem 2rem;
+    max-width: 550px;
     width: 90%;
     position: relative;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
@@ -1142,7 +1142,7 @@ body {
 
 .synergy-chart-container {
     width: 100%;
-    max-width: 450px;
+    max-width: 320px;
     margin: 0 auto;
     position: relative;
     aspect-ratio: 1 / 1;
@@ -1165,13 +1165,69 @@ body {
 }
 
 .synergy-legend {
-    margin-top: 2rem;
+    margin-top: 1rem;
     text-align: center;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: #cbd5e1;
     background: rgba(0, 0, 0, 0.2);
-    padding: 1rem;
+    padding: 0.8rem;
     border-radius: 0.75rem;
+}
+
+/* Tactical Info Section Styles */
+.target-synergy-details {
+    margin-top: 1rem;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 1rem;
+    padding: 1rem;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.target-synergy-details .info-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.5rem;
+}
+
+.target-synergy-details .info-target-name {
+    font-weight: 800;
+    color: var(--accent-blue);
+    font-size: 1rem;
+}
+
+.target-synergy-details .info-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.target-synergy-details .info-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.target-synergy-details .info-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--text-slate);
+    letter-spacing: 1px;
+}
+
+.target-synergy-details .weakness {
+    color: #ef4444;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.target-synergy-details .hint {
+    color: #cbd5e1;
+    font-size: 0.85rem;
+    line-height: 1.5;
 }
 
 .legend-gold {
