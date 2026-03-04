@@ -240,10 +240,9 @@ function renderGauntlet() {
             <button class="stage-btn">${statusText}</button>
         `;
 
-        // Allow clicking any non-cleared stage
-        if (!isCleared) {
-            node.querySelector('.stage-btn').onclick = () => selectStage(index);
-        }
+        // 모든 스테이지(클리어 포함, 단 현재 순서 이전의 잠긴 스테이지 제외) 클릭 가능하도록 수정
+        // 섭외된 캐릭터는 관리창으로, 미섭외는 전투 준비/경고창으로 유도
+        node.querySelector('.stage-btn').onclick = () => selectStage(index);
 
         mapContainer.appendChild(node);
     });
@@ -262,7 +261,58 @@ let pendingBriefingChar = null;
 
 function selectStage(index) {
     const char = characters[index];
-    if (!char || char.isRecruited) return;
+    if (!char) return;
+
+    // 수정: 이미 섭외(클리어)된 캐릭터 클릭 시 설전(관리) 화면으로 진입
+    if (char.isRecruited) {
+        // 만약 다른 미섭외 캐릭터와 전투 중이라면 중단 확인
+        if (currentTarget && !currentTarget.isRecruited) {
+            if (!confirm(`진행 중인 [${currentTarget.name}]과의 설전을 중단하고 캐릭터 상태를 확인하시겠습니까?`)) {
+                return;
+            }
+            cancelCurrentCombat();
+        }
+        // 섭외된 캐릭터 전용 진입 처리
+        doSelectStage(index, false);
+        return;
+    }
+
+    // 비순차 선택 감지: 현재 순서(currentStageIndex)보다 뒤 스테이지를 선택
+    if (index > currentStageIndex) {
+        // 경고 모달 표시
+        const modal = document.getElementById('skip-warning-modal');
+        modal.classList.remove('hidden');
+
+        // 버튼 이벤트 (1회성으로 등록해 중복 방지)
+        const confirmBtn = document.getElementById('skip-confirm-btn');
+        const cancelBtn = document.getElementById('skip-cancel-btn');
+
+        const onConfirm = () => {
+            modal.classList.add('hidden');
+            confirmBtn.removeEventListener('click', onConfirm);
+            cancelBtn.removeEventListener('click', onCancel);
+            doSelectStage(index, true); // 패널티 적용하여 진입
+        };
+
+        const onCancel = () => {
+            modal.classList.add('hidden');
+            confirmBtn.removeEventListener('click', onConfirm);
+            cancelBtn.removeEventListener('click', onCancel);
+            // 가운틀렛 맵으로 복귀
+            document.body.classList.add('show-gauntlet');
+        };
+
+        confirmBtn.addEventListener('click', onConfirm);
+        cancelBtn.addEventListener('click', onCancel);
+        return;
+    }
+
+    // 정상 순서 진입 (패널티 없음)
+    doSelectStage(index, false);
+}
+
+function doSelectStage(index, withPenalty) {
+    const char = characters[index];
 
     // 가운틀렛 닫기
     document.body.classList.remove('show-gauntlet');
@@ -280,13 +330,14 @@ function selectStage(index) {
     managerBaseStats.hp = 13000;
     managerBaseStats.maxHp = 13000;
 
-    // 비순차 패널티 적용
-    if (index !== currentStageIndex) {
+    // 비순차 패널티 적용 (멘탈 약화)
+    if (withPenalty) {
         managerBaseStats.atk *= 0.5;
         managerBaseStats.acc *= 0.5;
         managerBaseStats.crt *= 0.5;
         managerBaseStats.def *= 0.5;
         managerBaseStats.hp *= 0.5;
+        managerBaseStats.maxHp *= 0.5;
     }
     currentManagerHp = managerBaseStats.hp;
     updateManagerHpUI();
@@ -305,8 +356,17 @@ function selectStage(index) {
     repeatMap.clear();
 
     // UI 업데이트
-    document.getElementById('target-name').textContent = char.name;
+    document.getElementById('target-vs-name').textContent = char.name; // VS 화면용
+    document.getElementById('target-name').textContent = char.name;    // Trust 화면용
     document.getElementById('target-trait').textContent = char.trait;
+
+    // 획득 타이틀 표시 (Phase 2 UI용)
+    const titleEl = document.getElementById('target-achieved-title');
+    if (titleEl) {
+        titleEl.textContent = char.achievedTitle || (quests[char.id]?.titles[0] + " (임시)") || "";
+        titleEl.style.display = char.isRecruited ? 'inline-block' : 'none';
+    }
+
     updateCharacterImage();
     updateUIGauges();
 
@@ -315,15 +375,34 @@ function selectStage(index) {
     const lobbyWs = document.getElementById('lobby-target-workspace');
     if (lobbyWs) lobbyWs.classList.add('hidden');
 
-    // Combat UI 표시, Trust UI 숨기기
-    document.getElementById('phase-combat-ui').classList.remove('hidden');
-    document.getElementById('phase-trust-ui').classList.add('hidden');
-    document.getElementById('chat-input').disabled = true;
-    document.getElementById('send-btn').disabled = true;
+    // UI 모드 전환: 섭외 여부에 따라 Combat UI / Trust UI 분기
+    if (char.isRecruited) {
+        document.getElementById('phase-combat-ui').classList.add('hidden');
+        document.getElementById('phase-trust-ui').classList.remove('hidden');
+        document.querySelector('.main-workspace').classList.add('phase-trust');
 
-    // 미션 브리핑 오버레이 표시
-    pendingBriefingChar = char;
-    showQuestOverlay(char);
+        // 섭외된 캐릭터는 설전 입력 바로 활성화
+        document.getElementById('chat-input').disabled = false;
+        document.getElementById('send-btn').disabled = false;
+
+        // 브리핑 건너뜀
+        pendingBriefingChar = null;
+        document.getElementById('quest-overlay').classList.add('hidden');
+
+        // 섭외된 캐릭터 인트로 & 채팅 시작
+        startCharacterChat(char);
+
+    } else {
+        document.getElementById('phase-combat-ui').classList.remove('hidden');
+        document.getElementById('phase-trust-ui').classList.add('hidden');
+        document.querySelector('.main-workspace').classList.remove('phase-trust');
+        document.getElementById('chat-input').disabled = true;
+        document.getElementById('send-btn').disabled = true;
+
+        // 미션 브리핑 오버레이 표시
+        pendingBriefingChar = char;
+        showQuestOverlay(char);
+    }
 }
 
 function initCombat(char) {
@@ -613,36 +692,57 @@ function refreshSlider() {
     characters.forEach(char => {
         const icon = document.createElement('div');
         icon.className = 'face-icon';
-        icon.dataset.id = char.id; // Add data-id for selection logic
+        icon.dataset.id = char.id;
         if (char.isUnlocked) icon.classList.add('unlocked');
-        if (char.isRecruited) icon.classList.add('recruited'); // Add recruited class if already recruited
+        if (char.isRecruited) icon.classList.add('recruited');
+
+        // 내부 이미지 DIV 생성
+        const imgDiv = document.createElement('div');
+        imgDiv.className = 'face-img';
 
         // 아이콘을 배경 이미지로 채움
         if (char.images && char.images.normal) {
-            icon.style.backgroundImage = `url('${char.images.normal}')`;
+            imgDiv.style.backgroundImage = `url('${char.images.normal}')`;
         } else {
-            icon.innerHTML = `<span style="font-size: 20px;">${char.avatar}</span>`;
+            imgDiv.innerHTML = `<span style="font-size: 20px; display:flex; justify-content:center; align-items:center; height:100%; font-family:sans-serif;">${char.avatar}</span>`;
         }
+
+        icon.appendChild(imgDiv);
 
         icon.onclick = (e) => {
             if (e.ctrlKey || e.metaKey) {
-                setRepresentative(char); // Ctrl+Click to set as supporter
-            } else if (currentTarget) {
-                // 설전 진행 중 캐릭터 아이콘 클릭
-                const targetIdx = characters.indexOf(char);
-                if (char.isRecruited || targetIdx === currentStageIndex) {
-                    // 섭외 성공했거나 다음 순번인 캐릭터: 바로 전환
-                    selectCharacter(char, icon);
-                } else {
-                    // 미섭외 캐릭터: 경고 모달 표시
-                    showUnrecruitedWarning(char, icon);
-                }
+                setRepresentative(char);
             } else {
-                selectCharacter(char, icon);
+                // 수정: 섭외 완료된 캐릭터는 관리창으로, 아니면 시놉시스로
+                if (char.isRecruited) {
+                    selectStage(characters.indexOf(char));
+                } else {
+                    showCharacterSynopsisFromSidebar(char, icon);
+                }
             }
         };
         slider.appendChild(icon);
     });
+}
+
+function showCharacterSynopsisFromSidebar(char, icon) {
+    // 섭외되지 않은 캐릭터는 항상 시놉시스만 보기
+    // 채팅 시작 버튼 숨김 처리
+    document.getElementById('synopsis-title').textContent = `SYSTEM: 대상 식별 - ${char.name}`;
+    document.getElementById('synopsis-text').textContent = char.synopsis;
+    document.getElementById('synopsis-modal').classList.remove('hidden');
+
+    // 이 메뉴에서는 진입 불가하므로 START 버튼을 숨김
+    const startBtn = document.getElementById('btn-start-chat');
+    if (startBtn) startBtn.style.display = 'none';
+
+    // 닫기 버튼 이벤트 연결
+    const closeBtn = document.getElementById('close-synopsis-modal');
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            document.getElementById('synopsis-modal').classList.add('hidden');
+        };
+    }
 }
 
 function initUI() {
@@ -735,8 +835,27 @@ function initUI() {
         closeSynergyBtn.onclick = () => synergyModal.classList.add('hidden');
         window.onclick = (e) => { if (e.target === synergyModal) synergyModal.classList.add('hidden'); };
 
-        // Gauntlet Navigation
-        document.getElementById('manager-info').onclick = () => {
+        // Gauntlet Navigation from Stage Map Button
+        document.getElementById('btn-stage-map').onclick = () => {
+            // Check if there is an active battle running
+            if (currentTarget && !currentTarget.isRecruited) {
+                if (!confirm("진행 중인 설전을 중단하고 스테이지 맵으로 이동하시겠습니까?")) {
+                    return; // 취소시 이동 안 함
+                }
+
+                // 설전 중단 확인 후 뒤로가기
+                currentTarget = null;
+                pendingBriefingChar = null;
+
+                document.getElementById('phase-combat-ui').classList.add('hidden');
+                document.getElementById('phase-trust-ui').classList.add('hidden');
+                document.getElementById('quest-overlay').classList.add('hidden');
+                document.querySelectorAll('.face-icon').forEach(el => el.classList.remove('active'));
+
+                clearChatMessages();
+                document.querySelector('.main-workspace').classList.remove('mental-break');
+            }
+
             document.body.classList.add('show-gauntlet');
             renderGauntlet();
         };
@@ -1003,7 +1122,7 @@ function selectCharacter(char, icon) {
 
     document.getElementById('chat-messages').innerHTML = '';
 
-    // Phase 1: 시놉시스 모달창 - 섭외되지 않은 캐릭터는 항상 표시
+    // Phase 1: 시놉시스 모달창 - 섭외되지 않은 캐릭터는 항상 표시 (맵에서 진입할 때만)
     if (!char.isRecruited) {
         // 채팅창 비활성화
         document.getElementById('chat-input').disabled = true;
@@ -1014,14 +1133,22 @@ function selectCharacter(char, icon) {
         document.getElementById('synopsis-text').textContent = char.synopsis;
         document.getElementById('synopsis-modal').classList.remove('hidden');
 
-        // 모달창의 '대화 시작' 버튼 클릭 이벤트 리스너 임시 연결
+        // 맵에서 넘어왔으므로 다시 START 버튼 보이기 활성화 및 작동되게끔
         const btnStart = document.getElementById('btn-start-chat');
-        btnStart.onclick = () => {
-            char.hasSeenSynopsis = true;
-            document.getElementById('synopsis-modal').classList.add('hidden');
-            // 미션 브리핑 표시 (quest-start-btn에서 startCharacterChat 호출됨)
-            showQuestOverlay(char);
-        };
+        if (btnStart) btnStart.style.display = 'block';
+
+        const closeBtn = document.getElementById('close-synopsis-modal');
+        if (closeBtn) closeBtn.onclick = () => { document.getElementById('synopsis-modal').classList.add('hidden'); };
+
+        // 모달창의 '대화 시작' 버튼 클릭 이벤트 리스너 임시 연결
+        if (btnStart) {
+            btnStart.onclick = () => {
+                char.hasSeenSynopsis = true;
+                document.getElementById('synopsis-modal').classList.add('hidden');
+                // 미션 브리핑 표시 (quest-start-btn에서 startCharacterChat 호출됨)
+                showQuestOverlay(char);
+            };
+        }
     } else {
         startCharacterChat(char);
     }
@@ -1600,16 +1727,27 @@ function updateUIGauges() {
     const trPct = (currentTarget.trust / currentTarget.maxTrust) * 100;
     const playerHpPct = (currentManagerHp / managerBaseStats.maxHp) * 100;
 
-    // Phase 1 Bars
+    // Phase 1 Bars (Combat)
+    const phaseCombatUIs = document.getElementById('phase-combat-ui');
     const enemyHpFill = document.getElementById('hp-fill');
     const playerHpFill = document.getElementById('player-hp-fill');
 
     if (enemyHpFill) enemyHpFill.style.width = `${hpPct}%`;
     if (playerHpFill) playerHpFill.style.width = `${playerHpPct}%`;
 
-    // Phase 2 Bars
+    // Phase 2 Bars (Trust)
+    const phaseTrustUIs = document.getElementById('phase-trust-ui');
     const trFill = document.getElementById('trust-fill');
     if (trFill) trFill.style.width = `${trPct}%`;
+
+    // UI 가시성 보정 (재입장 시 등을 고려)
+    if (currentTarget.isRecruited) {
+        if (phaseCombatUIs) phaseCombatUIs.classList.add('hidden');
+        if (phaseTrustUIs) phaseTrustUIs.classList.remove('hidden');
+    } else {
+        if (phaseCombatUIs && !isMentalBreak) phaseCombatUIs.classList.remove('hidden');
+        // Trust UI는 Mental Break 때만 나중에 켜짐 (다른 함수에서 처리)
+    }
 
     // Vignette logic (Low HP Warning)
     const vignette = document.getElementById('vignette');
@@ -1690,17 +1828,27 @@ function startTrustDecay() {
         characters.forEach(char => {
             if (char.isUnlocked && char.trust > 0) {
                 char.trust = Math.max(0, char.trust - CONFIG.TRUST_DECAY_AMOUNT);
-                if (char.trust === 0 && char !== characters[0]) { // Don't lock Yuna in prototype
-                    char.isUnlocked = false;
-                    document.querySelectorAll('.face-icon').forEach((el, i) => {
-                        if (characters[i] === char) el.classList.remove('unlocked');
-                    });
+
+                // 현재 보고 있는 캐릭터인 경우 UI/이미지 갱신
+                if (currentTarget === char) {
+                    updateUIGauges();
+                    updateCharacterImage();
+
+                    // 신뢰도 하락 경고 메시지 (채팅 중일 때)
+                    if (char.isRecruited) {
+                        const trustPct = char.trust / char.maxTrust;
+                        if (char.trust === 0) {
+                            addMessage(`[시스템] ${char.name}의 신뢰도가 바닥을 쳤습니다. 멘탈이 붕괴되었습니다!`, 'ai', true);
+                        } else if (trustPct < 0.3) {
+                            addMessage(`[경고] ${char.name}의 신뢰도가 위험 수준입니다. 빨리 대화하여 신뢰를 회복하세요!`, 'ai', true);
+                        }
+                    }
                 }
             }
         });
-        updateUIGauges();
     }, CONFIG.TRUST_DECAY_INTERVAL);
 }
+
 
 function showFloatingText(text, color) {
     const fx = document.getElementById('fx-container');
@@ -1819,7 +1967,12 @@ function updateCharacterImage() {
     let imgPath = currentTarget.images.normal;
 
     if (currentTarget.isRecruited) {
-        imgPath = currentTarget.images.recruited;
+        // 섭외 완료된 캐릭터: 신뢰도가 0이면 멘탈 붕괴(break), 아니면 recruited 이미지
+        if (currentTarget.trust === 0) {
+            imgPath = currentTarget.images.break;
+        } else {
+            imgPath = currentTarget.images.recruited;
+        }
     } else if (isMentalBreak) {
         imgPath = currentTarget.images.break;
     }
@@ -1885,4 +2038,55 @@ function showUnrecruitedWarning(char, icon) {
     modal.addEventListener('click', (e) => {
         if (e.target === modal) modal.remove();
     });
+}
+// 신규: 현재 전투 중단 로직 (재사용성)
+function cancelCurrentCombat() {
+    currentTarget = null;
+    pendingBriefingChar = null;
+
+    document.getElementById('phase-combat-ui').classList.add('hidden');
+    document.getElementById('phase-trust-ui').classList.add('hidden');
+    document.getElementById('quest-overlay').classList.add('hidden');
+    document.querySelectorAll('.face-icon').forEach(el => el.classList.remove('active'));
+
+    clearChatMessages();
+    document.querySelector('.main-workspace').classList.remove('mental-break');
+
+    // 로비가 보이지 않도록 함
+    const lobbyWs = document.getElementById('lobby-target-workspace');
+    if (lobbyWs) lobbyWs.classList.add('hidden');
+}
+
+// 신규: 캐릭터 관리 모달 오픈 및 데이터 세팅
+function openCharacterManagement(char) {
+    document.getElementById('mgmt-avatar').textContent = char.avatar;
+    document.getElementById('mgmt-name').textContent = char.name;
+    document.getElementById('mgmt-trait').textContent = char.trait;
+
+    // 스탯 표시
+    document.getElementById('mgmt-hp').textContent = char.stats.hp;
+    document.getElementById('mgmt-atk').textContent = char.stats.atk;
+    document.getElementById('mgmt-def').textContent = char.stats.def;
+    document.getElementById('mgmt-acc').textContent = char.stats.acc;
+    document.getElementById('mgmt-crt').textContent = char.stats.crt;
+
+    document.getElementById('mgmt-synopsis').textContent = char.synopsis || "정보가 없습니다.";
+
+    const setRepBtn = document.getElementById('btn-mgmt-set-rep');
+    setRepBtn.onclick = () => {
+        setRepresentative(char);
+        document.getElementById('character-management-modal').classList.add('hidden');
+    };
+
+    const modal = document.getElementById('character-management-modal');
+    modal.classList.remove('hidden');
+
+    const closeBtn = document.getElementById('close-management-modal');
+    closeBtn.onclick = () => {
+        modal.classList.add('hidden');
+    };
+
+    window.onclick = (e) => {
+        if (e.target === modal) modal.classList.add('hidden');
+    };
 }
