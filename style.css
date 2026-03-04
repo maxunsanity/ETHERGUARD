@@ -2135,3 +2135,61 @@ body.show-gauntlet .gauntlet-overlay {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 2px;
 }
+
+/* Coach Marks Tutorial */
+.coach-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 40000;
+    pointer-events: auto;
+}
+
+.coach-highlight {
+    position: relative;
+    z-index: 40001 !important;
+    pointer-events: none;
+    box-shadow: 0 0 0 4px var(--accent-gold), 0 0 20px rgba(251, 191, 36, 0.8) !important;
+    background-color: var(--panel-bg);
+    border-radius: 4px;
+    animation: coachPulse 2s infinite;
+}
+
+@keyframes coachPulse {
+    0% {
+        box-shadow: 0 0 0 4px var(--accent-gold), 0 0 10px rgba(251, 191, 36, 0.5);
+    }
+
+    50% {
+        box-shadow: 0 0 0 4px var(--accent-gold), 0 0 25px rgba(251, 191, 36, 1);
+    }
+
+    100% {
+        box-shadow: 0 0 0 4px var(--accent-gold), 0 0 10px rgba(251, 191, 36, 0.5);
+    }
+}
+
+.coach-tooltip {
+    position: absolute;
+    width: 300px;
+    z-index: 40002;
+    padding: 20px;
+    border: 1px solid var(--accent-gold);
+    box-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
+    animation: coachFadeIn 0.3s ease-out;
+}
+
+@keyframes coachFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

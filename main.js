@@ -684,7 +684,9 @@ document.addEventListener('DOMContentLoaded', () => {
     startTrustDecay();
     renderGauntlet();
     updateLobbyStageInfo();
+    initTutorial();
 });
+
 
 function refreshSlider() {
     const slider = document.getElementById('face-icons');
@@ -2088,5 +2090,207 @@ function openCharacterManagement(char) {
 
     window.onclick = (e) => {
         if (e.target === modal) modal.classList.add('hidden');
+    };
+}
+
+// =============================================
+// TUTORIAL / COACH MARK SYSTEM
+// =============================================
+
+const TUTORIAL_STEPS = [
+    {
+        targetId: 'gauntlet-map',
+        title: '🗺️ 스테이지 맵',
+        desc: '게임의 핵심! 5개의 스테이지가 있으며, 순서대로 캐릭터를 클릭해 전투에 입장하세요. 금색 테두리 스테이지가 현재 진행 가능한 목표입니다.',
+        position: 'bottom'
+    },
+    {
+        targetId: 'face-icons',
+        title: '👥 캐릭터 슬라이더',
+        desc: '왼쪽 사이드바에는 캐릭터 아이콘이 있습니다. 클릭하면 시놉시스를 확인하거나 섭외된 캐릭터의 스탯을 관리할 수 있습니다.',
+        position: 'right'
+    },
+    {
+        targetId: 'btn-stage-map',
+        title: '🗺️ 맵 버튼',
+        desc: '이 버튼을 클릭하면 언제든지 스테이지 맵으로 돌아올 수 있습니다.',
+        position: 'right'
+    },
+    {
+        targetId: 'phase-combat-ui',
+        title: '⚔️ 전투 게이지',
+        desc: '전투 중에는 상단에 DIRECTOR(나)와 TARGET(적)의 HP 게이지가 표시됩니다. 상대의 HP를 0으로 만들면 멘탈 브레이크 상태로 전환됩니다!',
+        position: 'bottom'
+    },
+    {
+        targetId: 'skill-slots',
+        title: '🔮 스킬 슬롯',
+        desc: '5가지 속성 스킬(무력·논파·통찰·동화·심연)이 있습니다. 채팅 입력 시 자동으로 발동되거나, 직접 클릭해 특정 스킬을 사용할 수 있습니다. 쿨타임에 주의하세요!',
+        position: 'top'
+    },
+    {
+        targetId: 'fp-toggle-btn',
+        title: '🔥 발화점 시스템',
+        desc: '발화점(FP)을 사용하면 공격력이 최대 8배까지 증가합니다! 적의 스테이지가 높을수록 소비량이 커지니 전략적으로 사용하세요.',
+        position: 'top'
+    },
+    {
+        targetId: 'chat-input',
+        title: '💬 채팅 입력창',
+        desc: '이곳에 메시지를 입력해 상대를 설득하세요. 입력한 텍스트의 키워드에 따라 스킬이 자동 발동됩니다. 같은 말을 반복하면 효과가 줄어드니 다양하게 시도하세요!',
+        position: 'top'
+    }
+];
+
+let coachStepIndex = 0;
+let prevHighlightEl = null;
+
+function startTutorial() {
+    coachStepIndex = 0;
+    showCoachStep(0);
+}
+
+function showCoachStep(idx) {
+    const steps = TUTORIAL_STEPS;
+
+    // 이전 하이라이트 제거
+    if (prevHighlightEl) {
+        prevHighlightEl.classList.remove('coach-highlight');
+        prevHighlightEl.style.position = '';
+        prevHighlightEl.style.zIndex = '';
+        prevHighlightEl = null;
+    }
+
+    if (idx >= steps.length) {
+        endTutorial();
+        return;
+    }
+
+    const step = steps[idx];
+
+    // 1~3단계→ 가운틀렛 화면 보이기, 4~7단계→ 메인 화면 보이기
+    if (idx <= 2) {
+        document.body.classList.add('show-gauntlet');
+    } else {
+        document.body.classList.remove('show-gauntlet');
+    }
+
+    const targetEl = document.getElementById(step.targetId);
+
+    // 오버레이 표시
+    const overlay = document.getElementById('coach-overlay');
+    overlay.classList.remove('hidden');
+
+    // 툴팁 채우기
+    const tooltip = document.getElementById('coach-tooltip');
+    document.getElementById('coach-step-num').textContent = `${idx + 1} / ${steps.length}`;
+    document.getElementById('coach-title').textContent = step.title;
+    document.getElementById('coach-desc').textContent = step.desc;
+
+    // 마지막 단계는 버튼 텍스트 변경
+    const nextBtn = document.getElementById('coach-next-btn');
+    nextBtn.textContent = idx === steps.length - 1 ? '완료 ✓' : '다음 →';
+
+    // 하이라이트
+    if (targetEl) {
+        prevHighlightEl = targetEl;
+        targetEl.classList.add('coach-highlight');
+        targetEl.style.position = 'relative';
+        targetEl.style.zIndex = '40001';
+
+        // 툴팁 위치 계산 (requestAnimationFrame으로 렌더 후 측정)
+        requestAnimationFrame(() => {
+            const rect = targetEl.getBoundingClientRect();
+            tooltip.classList.remove('hidden');
+
+            const MARGIN = 14;
+            const TTW = 320;
+            const TTH = tooltip.offsetHeight || 160;
+
+            let top, left;
+            if (step.position === 'bottom') {
+                top = rect.bottom + MARGIN;
+                left = rect.left + rect.width / 2 - TTW / 2;
+            } else if (step.position === 'top') {
+                top = rect.top - TTH - MARGIN;
+                left = rect.left + rect.width / 2 - TTW / 2;
+            } else if (step.position === 'right') {
+                top = rect.top + rect.height / 2 - TTH / 2;
+                left = rect.right + MARGIN;
+            } else {
+                top = rect.bottom + MARGIN;
+                left = rect.left;
+            }
+
+            // 화면 밖 넘침 보정
+            left = Math.max(10, Math.min(left, window.innerWidth - TTW - 10));
+            top = Math.max(10, Math.min(top, window.innerHeight - TTH - 10));
+
+            tooltip.style.transform = '';
+            tooltip.style.top = top + 'px';
+            tooltip.style.left = left + 'px';
+        });
+    } else {
+        // 대상 요소가 없으면 중앙에 표시
+        tooltip.classList.remove('hidden');
+        tooltip.style.top = '50%';
+        tooltip.style.left = '50%';
+        tooltip.style.transform = 'translate(-50%, -50%)';
+    }
+}
+
+function endTutorial() {
+    // 하이라이트 제거
+    if (prevHighlightEl) {
+        prevHighlightEl.classList.remove('coach-highlight');
+        prevHighlightEl.style.position = '';
+        prevHighlightEl.style.zIndex = '';
+        prevHighlightEl = null;
+    }
+    document.getElementById('coach-overlay').classList.add('hidden');
+    document.getElementById('coach-tooltip').classList.add('hidden');
+    document.getElementById('coach-tooltip').style.transform = '';
+
+    // 완료 기록
+    localStorage.setItem('eg_tutorial_done', '1');
+}
+
+function initTutorial() {
+    const introModal = document.getElementById('tutorial-intro-modal');
+
+    // 이미 튜토리얼을 완료한 경우 건너뜀
+    if (localStorage.getItem('eg_tutorial_done') === '1') {
+        introModal.classList.add('hidden');
+        return;
+    }
+
+    // 첫 방문 시 모달 표시 (visible)
+    introModal.classList.remove('hidden');
+    // modal-overlay는 기본 opacity:0, visibility:hidden 이므로 직접 표시
+    introModal.style.opacity = '1';
+    introModal.style.visibility = 'visible';
+
+    document.getElementById('tutorial-yes-btn').onclick = () => {
+        introModal.style.opacity = '0';
+        introModal.style.visibility = 'hidden';
+        setTimeout(() => introModal.classList.add('hidden'), 300);
+        startTutorial();
+    };
+
+    document.getElementById('tutorial-no-btn').onclick = () => {
+        introModal.style.opacity = '0';
+        introModal.style.visibility = 'hidden';
+        setTimeout(() => introModal.classList.add('hidden'), 300);
+        localStorage.setItem('eg_tutorial_done', '1');
+    };
+
+    // 코치마크 버튼 이벤트
+    document.getElementById('coach-next-btn').onclick = () => {
+        coachStepIndex++;
+        showCoachStep(coachStepIndex);
+    };
+
+    document.getElementById('coach-skip-btn').onclick = () => {
+        endTutorial();
     };
 }
