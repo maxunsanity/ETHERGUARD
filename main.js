@@ -354,6 +354,8 @@ function doSelectStage(index, withPenalty) {
     qteCeilingCounter = 0;
     isQTEActive = false;
     repeatMap.clear();
+    diceChallengeTriggered = false; // 주사위 대전 도전 상태 리셋
+    diceDuelActive = false;
 
     // UI 업데이트
     document.getElementById('target-vs-name').textContent = char.name; // VS 화면용
@@ -1424,6 +1426,7 @@ function calculateDamage(text, skill, directSkillClick = false) {
 }
 
 function processCombatHit(res, skill) {
+    let prevHpPct = null;
     if (isMentalBreak || currentTarget.isRecruited) {
         // Phase 2 or Post-recruit: Damage adds to Trust
         currentTarget.trust = Math.min(currentTarget.maxTrust, currentTarget.trust + res.dmg);
@@ -1432,11 +1435,13 @@ function processCombatHit(res, skill) {
         // Feature 1: Trust 100% → 즉시 획득 (타이머 무시)
         if (currentTarget.trust >= currentTarget.maxTrust) {
             if (breakTimerFunc) clearInterval(breakTimerFunc);
+            updateUIGauges(); // 게이지를 먼저 100%로 갱신
             endMentalBreak();
             return;
         }
     } else {
         // Phase 1: Damage reduces Mental HP
+        prevHpPct = currentTarget.currentHp / currentTarget.stats.hp; // 주사위 트리거용 공격 전 HP 기록
         const overDmg = Math.max(0, res.dmg - currentTarget.currentHp);
         currentTarget.currentHp = Math.max(0, currentTarget.currentHp - res.dmg);
 
@@ -1473,7 +1478,15 @@ function processCombatHit(res, skill) {
         }
     }
 
-    if (currentTarget.currentHp <= 0 && !isMentalBreak && !currentTarget.isRecruited) enterMentalBreak();
+    // 멘탈 붕괴 또는 주사위 대전 처리
+    if (!currentTarget.isRecruited && !isMentalBreak) {
+        if (currentTarget.currentHp <= 0) {
+            enterMentalBreak();
+        } else if (prevHpPct !== null) {
+            checkDiceChallengeTrigger(prevHpPct);
+        }
+    }
+
     shakeScreen(res.isCrit ? 15 : 5);
     updateUIGauges();
 }
@@ -2294,3 +2307,209 @@ function initTutorial() {
         endTutorial();
     };
 }
+
+// =============================================
+// DICE DUEL SYSTEM
+// =============================================
+
+let diceDuelActive = false;
+let diceChallengeTriggered = false; // 중복 발생 방지용
+
+/**
+ * processCombatHit 후 호출: 점진적으로 HP 30% 이하로 떨어질 때만 도전장 발생
+ * @param {number} prevHpPct - 공격 *전* HP 비율 (0~1)
+ */
+function checkDiceChallengeTrigger(prevHpPct) {
+    if (!currentTarget || isMentalBreak || currentTarget.isRecruited) return;
+    if (diceChallengeTriggered || diceDuelActive) return;
+
+    const nowPct = currentTarget.currentHp / currentTarget.stats.hp;
+
+    // 70% 이하로 떨어진 것이 확인되면 즉시 트리거 (단, HP가 0보다는 커야 함)
+    if (nowPct <= 0.70 && currentTarget.currentHp > 0) {
+        diceChallengeTriggered = true;
+        diceDuelActive = true;
+        showDiceChallenge();
+    }
+}
+
+/** 하단 UI 토글 함수 */
+function toggleDiceDuelUI(show) {
+    const standard = document.getElementById('standard-battle-controls');
+    const dice = document.getElementById('dice-duel-controls');
+
+    if (show) {
+        standard.classList.add('hidden');
+        dice.classList.remove('hidden');
+    } else {
+        standard.classList.remove('hidden');
+        dice.classList.add('hidden');
+        // 내부 뷰 초기화
+        document.getElementById('dice-challenge-view').classList.add('hidden');
+        document.getElementById('dice-game-view').classList.add('hidden');
+    }
+}
+
+function showDiceChallenge() {
+    toggleDiceDuelUI(true);
+    const challengeView = document.getElementById('dice-challenge-view');
+    challengeView.classList.remove('hidden');
+
+    document.getElementById('dice-challenge-msg-mini').textContent =
+        `${currentTarget.name}이(가) 정면 승부를 신청했습니다! 수락하시겠습니까? (거절 시 2배 반격)`;
+
+    const acceptBtn = document.getElementById('dice-accept-btn-mini');
+    const rejectBtn = document.getElementById('dice-reject-btn-mini');
+
+    const cleanup = () => {
+        acceptBtn.onclick = null;
+        rejectBtn.onclick = null;
+        challengeView.classList.add('hidden');
+    };
+
+    acceptBtn.onclick = () => { cleanup(); openDiceGame(); };
+    rejectBtn.onclick = () => { cleanup(); applyDiceRejectPenalty(); };
+}
+
+function applyDiceRejectPenalty() {
+    diceDuelActive = false;
+    const baseDmg = Math.floor(currentTarget.stats.atk * 2);
+    currentManagerHp = Math.max(0, currentManagerHp - baseDmg);
+    updateManagerHpUI();
+    showFloatingText(`COUNTERATTACK! -${baseDmg}`, '#f43f5e');
+    shakeScreen(25);
+    addMessage(`[도전 거절] ${currentTarget.name}이(가) 분노하며 강력한 반격을 가했습니다! (${baseDmg} 대미지)`, 'ai', true);
+
+    toggleDiceDuelUI(false);
+    updateUIGauges();
+    checkGameOver();
+}
+
+function openDiceGame() {
+    const gameView = document.getElementById('dice-game-view');
+    gameView.classList.remove('hidden');
+    document.getElementById('dice-enemy-label-mini').textContent = currentTarget.name.toUpperCase();
+
+    ['dir-die-1-mini', 'dir-die-2-mini', 'ene-die-1-mini', 'ene-die-2-mini'].forEach(id => {
+        const el = document.getElementById(id);
+        el.textContent = '?';
+        el.classList.remove('rolling', 'revealed');
+    });
+    document.getElementById('dir-total-mini').textContent = '?';
+    document.getElementById('ene-total-mini').textContent = '?';
+
+    const resultEl = document.getElementById('dice-result-mini');
+    resultEl.textContent = '';
+    resultEl.className = 'dice-result-mini hidden';
+
+    const rollBtn = document.getElementById('dice-roll-btn-mini');
+    const closeBtn = document.getElementById('dice-close-btn-mini');
+    rollBtn.classList.remove('hidden');
+    rollBtn.disabled = false;
+    closeBtn.classList.add('hidden');
+
+    rollBtn.onclick = () => performDiceRoll();
+}
+
+function performDiceRoll() {
+    const rollBtn = document.getElementById('dice-roll-btn-mini');
+    rollBtn.disabled = true;
+
+    const diceIds = ['dir-die-1-mini', 'dir-die-2-mini', 'ene-die-1-mini', 'ene-die-2-mini'];
+    diceIds.forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.add('rolling');
+    });
+
+    setTimeout(() => {
+        const d1 = Math.floor(Math.random() * 6) + 1;
+        const d2 = Math.floor(Math.random() * 6) + 1;
+        const e1 = Math.floor(Math.random() * 6) + 1;
+        const e2 = Math.floor(Math.random() * 6) + 1;
+        const dirTotal = d1 + d2;
+        const eneTotal = e1 + e2;
+
+        const reveal = (id, val) => {
+            const el = document.getElementById(id);
+            el.classList.remove('rolling');
+            el.classList.add('revealed');
+            el.textContent = val;
+        };
+        reveal('dir-die-1-mini', d1);
+        reveal('dir-die-2-mini', d2);
+        reveal('ene-die-1-mini', e1);
+        reveal('ene-die-2-mini', e2);
+
+        document.getElementById('dir-total-mini').textContent = dirTotal;
+        document.getElementById('ene-total-mini').textContent = eneTotal;
+
+        const directorWins = dirTotal > 6;
+        const resultEl = document.getElementById('dice-result-mini');
+        resultEl.classList.remove('hidden');
+
+        if (directorWins) {
+            resultEl.textContent = 'WIN!';
+            resultEl.className = 'dice-result-mini director-win';
+        } else {
+            resultEl.textContent = 'LOSE';
+            resultEl.className = 'dice-result-mini enemy-win';
+        }
+
+        rollBtn.classList.add('hidden');
+        const closeBtn = document.getElementById('dice-close-btn-mini');
+        closeBtn.classList.remove('hidden');
+        closeBtn.onclick = () => {
+            resolveDiceResult(directorWins);
+        };
+    }, 1000);
+}
+
+function resolveDiceResult(directorWins) {
+    diceDuelActive = false;
+    toggleDiceDuelUI(false);
+
+    if (directorWins) {
+        // 디렉터 승: 가장 효과적인 속성 공격 단, 데미지는 남아있는 멘탈의 30%를 넘지 않음
+        const bestSkill = findBestSkillForTarget();
+        const mult = bestSkill ? bestSkill.multiplier : 1.5;
+        let bonusDmg = Math.floor(currentTarget.stats.hp * 0.25 * mult);
+        const maxAllowedDmg = Math.floor(currentTarget.currentHp * 0.30); // 남은 HP의 30% 상한선
+        bonusDmg = Math.min(bonusDmg, maxAllowedDmg);
+
+        currentTarget.currentHp = Math.max(0, currentTarget.currentHp - bonusDmg);
+        showFloatingText(`DICE WIN! -${bonusDmg}`, '#38bdf8');
+        triggerCriticalFlash();
+        shakeScreen(20);
+        const skillName = bestSkill ? bestSkill.name : '강타';
+        addMessage(`[주사위 승리] 디렉터가 [${skillName}] 속성으로 압도적 공격! (${bonusDmg} 대미지)`, 'ai', true);
+        updateUIGauges();
+        document.getElementById('chat-input').disabled = false;
+        document.getElementById('send-btn').disabled = false;
+        if (currentTarget.currentHp <= 0 && !isMentalBreak) enterMentalBreak();
+    } else {
+        // 캐릭터 승: 일반 반격
+        const counterDmg = Math.floor(currentTarget.stats.atk * 1.2);
+        currentManagerHp = Math.max(0, currentManagerHp - counterDmg);
+        updateManagerHpUI();
+        showFloatingText(`DICE LOSE! -${counterDmg}`, '#f43f5e');
+        shakeScreen(15);
+        addMessage(`[주사위 패배] ${currentTarget.name}이(가) 역공을 가합니다! (${counterDmg} 대미지)`, 'ai', true);
+        updateUIGauges();
+        document.getElementById('chat-input').disabled = false;
+        document.getElementById('send-btn').disabled = false;
+        checkGameOver();
+    }
+}
+
+function findBestSkillForTarget() {
+    if (!currentTarget || !currentTarget.props) return skills[0];
+    for (const prop of currentTarget.props) {
+        const entry = Object.entries(synergyMap).find(([, val]) => val.strong === prop);
+        if (entry) {
+            const sk = skills.find(s => s.id === entry[0]);
+            if (sk) return sk;
+        }
+    }
+    return skills[0];
+}
+

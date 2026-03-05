@@ -194,71 +194,119 @@
 
                 <!-- Bottom: Skills & Input -->
                 <footer class="battle-footer glass">
-                    <div class="footer-top">
-                        <div class="skill-controls">
-                            <div class="skill-slots" id="skill-slots">
-                                <div class="skill-item" id="skill-BODY" title="무력 시위 (Force)">
-                                    <div class="skill-icon-container">
-                                        <img src="skill_force.png" alt="무력" class="skill-icon-img">
-                                        <div class="cooldown-overlay"></div>
+                    <!-- Standard Battle Controls Container (to be hidden during Dice Duel) -->
+                    <div id="standard-battle-controls">
+                        <div class="footer-top">
+                            <div class="skill-controls">
+                                <div class="skill-slots" id="skill-slots">
+                                    <div class="skill-item" id="skill-BODY" title="무력 시위 (Force)">
+                                        <div class="skill-icon-container">
+                                            <img src="skill_force.png" alt="무력" class="skill-icon-img">
+                                            <div class="cooldown-overlay"></div>
+                                        </div>
+                                        <span class="skill-name">무력 시위</span>
                                     </div>
-                                    <span class="skill-name">무력 시위</span>
+                                    <div class="skill-item" id="skill-LOGIC" title="논파 (Refutation)">
+                                        <div class="skill-icon-container">
+                                            <img src="skill_refutation.png" alt="논파" class="skill-icon-img">
+                                            <div class="cooldown-overlay"></div>
+                                        </div>
+                                        <span class="skill-name">논파</span>
+                                    </div>
+                                    <div class="skill-item" id="skill-SENSE" title="예리한 통찰 (Insight)">
+                                        <div class="skill-icon-container">
+                                            <img src="skill_insight.png" alt="통찰" class="skill-icon-img">
+                                            <div class="cooldown-overlay"></div>
+                                        </div>
+                                        <span class="skill-name">통찰</span>
+                                    </div>
+                                    <div class="skill-item" id="skill-HEART" title="감정 동화 (Empathy)">
+                                        <div class="skill-icon-container">
+                                            <img src="skill_empathy.png" alt="동화" class="skill-icon-img">
+                                            <div class="cooldown-overlay"></div>
+                                        </div>
+                                        <span class="skill-name">동화</span>
+                                    </div>
+                                    <div class="skill-item" id="skill-MYSTIC" title="심연의 응시 (Abyss)">
+                                        <div class="skill-icon-container">
+                                            <img src="skill_abyss.png" alt="심연" class="skill-icon-img">
+                                            <div class="cooldown-overlay"></div>
+                                        </div>
+                                        <span class="skill-name">심연</span>
+                                    </div>
                                 </div>
-                                <div class="skill-item" id="skill-LOGIC" title="논파 (Refutation)">
-                                    <div class="skill-icon-container">
-                                        <img src="skill_refutation.png" alt="논파" class="skill-icon-img">
-                                        <div class="cooldown-overlay"></div>
-                                    </div>
-                                    <span class="skill-name">논파</span>
+                                <div class="firepoint-display">
+                                    <span class="skill-icon">🔥</span>
+                                    <span class="skill-count" id="item-count">10000</span>
                                 </div>
-                                <div class="skill-item" id="skill-SENSE" title="예리한 통찰 (Insight)">
-                                    <div class="skill-icon-container">
-                                        <img src="skill_insight.png" alt="통찰" class="skill-icon-img">
-                                        <div class="cooldown-overlay"></div>
+                                <div class="firepoint-selector">
+                                    <button id="fp-toggle-btn" class="fp-toggle off">사용안함</button>
+                                    <div id="fp-off-info" class="fp-off-badge">x0</div>
+                                    <div id="fp-stepper-container" class="fp-stepper hidden">
+                                        <button id="fp-minus" class="stepper-btn">−</button>
+                                        <div class="fp-input-display">
+                                            <span id="current-fp-use">0</span>
+                                            <small class="fp-unit">개</small>
+                                        </div>
+                                        <button id="fp-plus" class="stepper-btn">+</button>
                                     </div>
-                                    <span class="skill-name">통찰</span>
-                                </div>
-                                <div class="skill-item" id="skill-HEART" title="감정 동화 (Empathy)">
-                                    <div class="skill-icon-container">
-                                        <img src="skill_empathy.png" alt="동화" class="skill-icon-img">
-                                        <div class="cooldown-overlay"></div>
-                                    </div>
-                                    <span class="skill-name">동화</span>
-                                </div>
-                                <div class="skill-item" id="skill-MYSTIC" title="심연의 응시 (Abyss)">
-                                    <div class="skill-icon-container">
-                                        <img src="skill_abyss.png" alt="심연" class="skill-icon-img">
-                                        <div class="cooldown-overlay"></div>
-                                    </div>
-                                    <span class="skill-name">심연</span>
-                                </div>
-                            </div>
-                            <div class="firepoint-display">
-                                <span class="skill-icon">🔥</span>
-                                <span class="skill-count" id="item-count">10000</span>
-                            </div>
-                            <div class="firepoint-selector">
-                                <button id="fp-toggle-btn" class="fp-toggle off">사용안함</button>
-                                <div id="fp-off-info" class="fp-off-badge">x0</div>
-                                <div id="fp-stepper-container" class="fp-stepper hidden">
-                                    <button id="fp-minus" class="stepper-btn">−</button>
-                                    <div class="fp-input-display">
-                                        <span id="current-fp-use">0</span>
-                                        <small class="fp-unit">개</small>
-                                    </div>
-                                    <button id="fp-plus" class="stepper-btn">+</button>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="keyword-tags" id="keyword-tags">
+                            <!-- Auto-complete tags will be here -->
+                        </div>
+
+                        <div class="input-wrapper">
+                            <input type="text" id="chat-input" placeholder="메시지를 입력하여 설득을 시작하세요..." disabled>
+                            <button id="send-btn" disabled>SEND</button>
+                        </div>
                     </div>
 
-                    <div class="keyword-tags" id="keyword-tags">
-                        <!-- Auto-complete tags will be here -->
-                    </div>
+                    <!-- Dice Duel UI Container (Hidden by default) -->
+                    <div id="dice-duel-controls" class="hidden">
+                        <!-- Dice Challenge View -->
+                        <div id="dice-challenge-view" class="hidden">
+                            <div class="dice-challenge-row">
+                                <div class="dice-challenge-text-side">
+                                    <h3 class="dice-mini-title">⚔️ 정면 승부 도전!</h3>
+                                    <p id="dice-challenge-msg-mini" class="dice-mini-desc"></p>
+                                </div>
+                                <div class="dice-challenge-btn-side">
+                                    <button id="dice-reject-btn-mini" class="dice-mini-btn cancel">거절 (2배 반격)</button>
+                                    <button id="dice-accept-btn-mini" class="dice-mini-btn confirm">승부 수락 🎲</button>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="input-wrapper">
-                        <input type="text" id="chat-input" placeholder="메시지를 입력하여 설득을 시작하세요..." disabled>
-                        <button id="send-btn" disabled>SEND</button>
+                        <!-- Dice Game View -->
+                        <div id="dice-game-view" class="hidden">
+                            <div class="dice-game-row">
+                                <div class="dice-side-mini director-mini">
+                                    <span class="dice-label-mini">DIRECTOR</span>
+                                    <div class="dice-pair-mini">
+                                        <div class="dice-face-mini" id="dir-die-1-mini">?</div>
+                                        <div class="dice-face-mini" id="dir-die-2-mini">?</div>
+                                    </div>
+                                    <span class="dice-total-mini" id="dir-total-mini">?</span>
+                                </div>
+                                <div class="dice-vs-mini">VS</div>
+                                <div class="dice-side-mini enemy-mini">
+                                    <span class="dice-label-mini" id="dice-enemy-label-mini">ENEMY</span>
+                                    <div class="dice-pair-mini">
+                                        <div class="dice-face-mini" id="ene-die-1-mini">?</div>
+                                        <div class="dice-face-mini" id="ene-die-2-mini">?</div>
+                                    </div>
+                                    <span class="dice-total-mini" id="ene-total-mini">?</span>
+                                </div>
+                                <div class="dice-action-mini">
+                                    <button id="dice-roll-btn-mini" class="dice-action-btn">🎲 굴리기!</button>
+                                    <div id="dice-result-mini" class="dice-result-mini hidden"></div>
+                                    <button id="dice-close-btn-mini" class="dice-action-btn hidden">확인</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </footer>
             </div>
@@ -270,6 +318,52 @@
         <div class="qte-content">
             <div id="qte-question" class="qte-question"></div>
             <div id="qte-options" class="qte-options"></div>
+        </div>
+    </div>
+
+    <!-- Dice Duel Challenge Modal -->
+    <div id="dice-challenge-modal" class="modal-overlay hidden" style="z-index: 16000;">
+        <div class="modal-content glass dice-challenge-box">
+            <div class="dice-challenge-icon">⚔️</div>
+            <h2 class="dice-challenge-title">도전장!</h2>
+            <p id="dice-challenge-msg" class="dice-challenge-desc"></p>
+            <div class="dice-challenge-penalty">
+                <span>🎲 주사위 대전</span>
+                <span class="penalty-text">6 초과 = 디렉터 승 · 6 이하 = 캐릭터 승</span>
+            </div>
+            <div class="dice-challenge-buttons">
+                <button id="dice-reject-btn" class="skip-btn cancel">거절 (반격 2배 감수)</button>
+                <button id="dice-accept-btn" class="skip-btn confirm">수락 ⚔️</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dice Game Modal -->
+    <div id="dice-game-modal" class="modal-overlay hidden" style="z-index: 16000;">
+        <div class="modal-content glass dice-game-box">
+            <h2 class="dice-game-title">🎲 주사위 대전</h2>
+            <div class="dice-arena">
+                <div class="dice-side director-side">
+                    <p class="dice-label">DIRECTOR</p>
+                    <div class="dice-pair">
+                        <div class="dice-face" id="dir-die-1">?</div>
+                        <div class="dice-face" id="dir-die-2">?</div>
+                    </div>
+                    <p class="dice-total" id="dir-total">합계: ?</p>
+                </div>
+                <div class="dice-vs">VS</div>
+                <div class="dice-side enemy-side">
+                    <p class="dice-label" id="dice-enemy-label">ENEMY</p>
+                    <div class="dice-pair">
+                        <div class="dice-face" id="ene-die-1">?</div>
+                        <div class="dice-face" id="ene-die-2">?</div>
+                    </div>
+                    <p class="dice-total" id="ene-total">합계: ?</p>
+                </div>
+            </div>
+            <p id="dice-result-msg" class="dice-result-msg hidden"></p>
+            <button id="dice-roll-btn" class="skip-btn confirm" style="width:100%; margin-top:20px;">🎲 굴리기!</button>
+            <button id="dice-close-btn" class="skip-btn cancel hidden" style="width:100%; margin-top:10px;">확인</button>
         </div>
     </div>
 

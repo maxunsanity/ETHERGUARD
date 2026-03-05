@@ -2182,14 +2182,360 @@ body.show-gauntlet .gauntlet-overlay {
     animation: coachFadeIn 0.3s ease-out;
 }
 
-@keyframes coachFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
+/* ===== Dice Duel System (Footer Integrated) ===== */
+#dice-duel-controls {
+    width: 100%;
+    padding: 10px 20px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Challenge Row */
+.dice-challenge-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.dice-challenge-text-side {
+    flex: 1;
+}
+
+.dice-mini-title {
+    font-size: 1.2rem;
+    color: var(--accent-gold);
+    margin-bottom: 4px;
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+}
+
+.dice-mini-desc {
+    font-size: 0.9rem;
+    color: var(--text-slate);
+    line-height: 1.4;
+}
+
+.dice-challenge-btn-side {
+    display: flex;
+    gap: 10px;
+}
+
+.dice-mini-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.dice-mini-btn.confirm {
+    background: var(--accent-gold);
+    color: var(--bg-dark);
+}
+
+.dice-mini-btn.cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-white);
+}
+
+/* Game Row */
+.dice-game-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.dice-side-mini {
+    display: flex;
+    flex-direction: row;
+    /* Horizontal layout in footer */
+    align-items: center;
+    gap: 15px;
+}
+
+.dice-label-mini {
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    width: 70px;
+}
+
+.director-mini .dice-label-mini {
+    color: var(--accent-blue);
+}
+
+.enemy-mini .dice-label-mini {
+    color: var(--enemy-red);
+}
+
+.dice-pair-mini {
+    display: flex;
+    gap: 8px;
+}
+
+.dice-face-mini {
+    width: 45px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid var(--border-light);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--text-white);
+}
+
+.dice-face-mini.rolling {
+    animation: diceRoll 0.15s infinite;
+}
+
+.dice-face-mini.revealed {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+}
+
+.dice-total-mini {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--text-white);
+    min-width: 30px;
+}
+
+.dice-vs-mini {
+    font-size: 1.2rem;
+    font-weight: 900;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.dice-action-mini {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 150px;
+    justify-content: flex-end;
+}
+
+.dice-action-btn {
+    padding: 10px 25px;
+    background: var(--accent-gold);
+    color: var(--bg-dark);
+    border-radius: 8px;
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+}
+
+.dice-result-mini {
+    font-size: 1.1rem;
+    font-weight: 900;
+    padding: 5px 15px;
+    border-radius: 8px;
+}
+
+.dice-result-mini.director-win {
+    color: var(--accent-blue);
+}
+
+.dice-result-mini.enemy-win {
+    color: var(--enemy-red);
+}
+
+/* Keep existing diceRoll animation */
+@keyframes diceRoll {
+    0% {
+        transform: rotate(-5deg);
     }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    100% {
+        transform: rotate(5deg);
     }
+}
+
+/* ===== Dice Duel System ===== */
+.dice-challenge-box {
+    text-align: center;
+    padding: 2.5rem 2rem;
+    max-width: 420px;
+    border: 1px solid rgba(251, 191, 36, 0.5);
+    box-shadow: 0 0 50px rgba(251, 191, 36, 0.25);
+    animation: fadeInScale 0.2s ease-out;
+}
+
+.dice-challenge-icon {
+    font-size: 3.5rem;
+    animation: warningPulse 0.8s infinite;
+    margin-bottom: 0.5rem;
+}
+
+.dice-challenge-title {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--accent-gold);
+    letter-spacing: 3px;
+    margin-bottom: 0.8rem;
+    text-shadow: 0 0 20px rgba(251, 191, 36, 0.7);
+}
+
+.dice-challenge-desc {
+    font-size: 1rem;
+    color: var(--text-slate);
+    line-height: 1.7;
+    margin-bottom: 1.2rem;
+}
+
+.dice-challenge-penalty {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    border-radius: 12px;
+    padding: 0.7rem 1.2rem;
+    margin-bottom: 1.8rem;
+    font-size: 0.85rem;
+    color: var(--accent-gold);
+}
+
+.dice-challenge-buttons {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: center;
+}
+
+/* Dice Game Modal */
+.dice-game-box {
+    text-align: center;
+    padding: 2.5rem 2rem;
+    max-width: 520px;
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    box-shadow: 0 0 50px rgba(251, 191, 36, 0.2);
+    animation: fadeInScale 0.2s ease-out;
+}
+
+.dice-game-title {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--accent-gold);
+    letter-spacing: 2px;
+    margin-bottom: 1.5rem;
+}
+
+.dice-arena {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.dice-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.dice-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--text-slate);
+}
+
+.director-side .dice-label {
+    color: var(--accent-blue);
+}
+
+.enemy-side .dice-label {
+    color: var(--enemy-red);
+}
+
+.dice-pair {
+    display: flex;
+    gap: 0.7rem;
+}
+
+.dice-face {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--text-white);
+    transition: all 0.3s ease;
+}
+
+.dice-face.rolling {
+    animation: diceRoll 0.15s infinite;
+    border-color: var(--accent-gold);
+    background: rgba(251, 191, 36, 0.1);
+}
+
+.dice-face.revealed {
+    border-color: var(--accent-gold);
+    background: rgba(251, 191, 36, 0.08);
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
+}
+
+@keyframes diceRoll {
+    0% {
+        transform: rotate(-5deg) scale(0.95);
+    }
+
+    50% {
+        transform: rotate(5deg) scale(1.05);
+    }
+
+    100% {
+        transform: rotate(-5deg) scale(0.95);
+    }
+}
+
+.dice-total {
+    font-size: 0.85rem;
+    color: var(--text-slate);
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.dice-vs {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: white;
+    font-style: italic;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.dice-result-msg {
+    font-size: 1.3rem;
+    font-weight: 900;
+    margin: 0.5rem 0;
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    letter-spacing: 1px;
+    animation: fadeInScale 0.3s ease-out;
+}
+
+.dice-result-msg.director-win {
+    color: var(--accent-blue);
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+}
+
+.dice-result-msg.enemy-win {
+    color: var(--enemy-red);
+    background: rgba(244, 63, 94, 0.1);
+    border: 1px solid rgba(244, 63, 94, 0.3);
+    text-shadow: 0 0 15px rgba(244, 63, 94, 0.5);
 }
